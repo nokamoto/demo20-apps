@@ -1,13 +1,25 @@
 apiVersion: skaffold/v2beta6
 kind: Config
 metadata:
-  name: demo--go-template
+  name: demo--apps
 build:
   artifacts:
-  - image: app
+  - image: compute
     docker:
       buildArgs:
-        cmd: app
+        cmd: compute
+  - image: iam
+    docker:
+      buildArgs:
+        cmd: iam
+  - image: rdb
+    docker:
+      buildArgs:
+        cmd: rdb
+  - image: resourcemanager
+    docker:
+      buildArgs:
+        cmd: resourcemanager
 deploy:
   kustomize:
     paths:
