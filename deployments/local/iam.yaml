@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: iam
+  name: iam
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: iam
+  template:
+    metadata:
+      labels:
+        app: iam
+    spec:
+      containers:
+      - image: iam
+        name: iam

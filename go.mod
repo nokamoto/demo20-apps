@@ -1,4 +1,4 @@
-module github.com/nokamoto/demo20-go-template
+module github.com/nokamoto/demo20-apps
 
 go 1.15
 

@@ -2,18 +2,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: app
-  name: app
+    app: rdb
+  name: rdb
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app
+      app: rdb
   template:
     metadata:
       labels:
-        app: app
+        app: rdb
     spec:
       containers:
-      - image: app
-        name: app
+      - image: rdb
+        name: rdb

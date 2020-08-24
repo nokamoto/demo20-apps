@@ -1,2 +1,5 @@
 resources:
-- app.yaml
+- compute.yaml
+- iam.yaml
+- rdb.yaml
+- resourcemanager.yaml
