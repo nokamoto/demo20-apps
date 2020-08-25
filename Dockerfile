@@ -10,6 +10,7 @@ COPY go.sum .
 RUN go mod download
 
 COPY cmd/${cmd} cmd/${cmd}
+COPY internal internal
 
 RUN go install ./cmd/${cmd}
 
