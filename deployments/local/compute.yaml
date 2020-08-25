@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,3 +18,23 @@ spec:
       containers:
       - image: compute
         name: compute
+        env:
+        - name: LOGGER_DEBUG
+          value: "1"
+        - name: GRPC_SERVER_PORT
+          value: "9000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: compute
+  name: compute
+spec:
+  ports:
+  - name: http2
+    port: 9000
+    protocol: TCP
+  selector:
+    app: compute
+  type: ClusterIP
