@@ -121,7 +121,7 @@ func TestQuery_Get(t *testing.T) {
 		},
 		{
 			Name: "NotFound",
-			Run:  run("foo", nil),
+			Run:  run("foo", &Instance{}),
 			Mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `compute_instance` WHERE (instance_id = ?) LIMIT 1")).
 					WithArgs("foo").

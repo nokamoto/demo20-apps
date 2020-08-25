@@ -8,43 +8,24 @@ import (
 // Query defines queries for a instance table within a transaction.
 type Query struct{}
 
-// Create inserts an instance record.
+// Create inserts the instance record.
 func (Query) Create(tx *gorm.DB, instance *Instance) error {
-	res := tx.Debug().Create(instance)
-	if res.Error != nil {
-		return core.Translate(res.Error)
-	}
-	return nil
+	return core.Create(tx, instance)
 }
 
-// Delete deletes an instance record by an instance id.
+// Delete deletes an instance record by the instance id.
 func (Query) Delete(tx *gorm.DB, id string) error {
-	res := tx.Debug().Where("instance_id = ?", id).Delete(&Instance{})
-	if res.Error != nil {
-		return core.Translate(res.Error)
-	}
-	return nil
+	return core.Delete(tx, &Instance{}, "instance_id = ?", id)
 }
 
-// Get returns an instance record by an instance id.
+// Get returns an instance record by the instance id.
 func (Query) Get(tx *gorm.DB, id string) (*Instance, error) {
 	var instance Instance
-	res := tx.Debug().Where("instance_id = ?", id).Take(&instance)
-	if res.RecordNotFound() {
-		return nil, core.ErrNotFound
-	}
-	if res.Error != nil {
-		return nil, core.Translate(res.Error)
-	}
-	return &instance, nil
+	return &instance, core.Get(tx, &instance, "instance_id = ?", id)
 }
 
-// List returns instance records by a parent id.
+// List returns instance records by the parent id.
 func (Query) List(tx *gorm.DB, parentKey int64, offset int, limit int) ([]*Instance, error) {
 	var instances []*Instance
-	res := tx.Debug().Where("parent_key = ?", parentKey).Offset(offset).Limit(limit).Find(&instances)
-	if res.Error != nil {
-		return nil, core.Translate(res.Error)
-	}
-	return instances, nil
+	return instances, core.List(tx, &instances, offset, limit, "parent_key = ?", parentKey)
 }
