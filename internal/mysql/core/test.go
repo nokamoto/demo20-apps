@@ -4,6 +4,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
 )
@@ -82,5 +84,28 @@ func (xs TestCases) Run(t *testing.T) {
 				t.Error(err)
 			}
 		})
+	}
+}
+
+// Diff1 asserts that a1 is equal to e1.
+func Diff1(a1 interface{}, err error) func(*testing.T, interface{}) error {
+	return func(t *testing.T, e1 interface{}) error {
+		if diff := cmp.Diff(e1, a1); len(diff) != 0 {
+			t.Error(diff)
+		}
+		return err
+	}
+}
+
+// Diff2 asserts that a1 is equal to e1, and so on.
+func Diff2(a1, a2 interface{}, err error) func(*testing.T, interface{}, interface{}) error {
+	return func(t *testing.T, e1, e2 interface{}) error {
+		if diff := cmp.Diff(e1, a1); len(diff) != 0 {
+			t.Error(diff)
+		}
+		if diff := cmp.Diff(e2, a2); len(diff) != 0 {
+			t.Error(diff)
+		}
+		return err
 	}
 }

@@ -2,9 +2,9 @@ package resourcemanager
 
 // Project represents a project table.
 type Project struct {
-	projectKey  int64  `gorm:"column:project_key;auto_increment;primary_key"`
-	projectID   string `gorm:"column:project_id"`
-	displayName string `gorm:"column:display_name"`
+	ProjectKey  int64  `gorm:"column:project_key;auto_increment;primary_key"`
+	ProjectID   string `gorm:"column:project_id"`
+	DisplayName string `gorm:"column:display_name"`
 }
 
 // TableName returns a table name.

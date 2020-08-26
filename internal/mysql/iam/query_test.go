@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/google/go-cmp/cmp"
 	"github.com/jinzhu/gorm"
 	"github.com/nokamoto/demo20-apps/internal/mysql/core"
 )
@@ -52,11 +51,7 @@ func TestPermissionQuery_List(t *testing.T) {
 
 	run := func(permissionIDs []string, expected []*Permission) core.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			actual, err := PermissionQuery{}.List(tx, permissionIDs...)
-			if diff := cmp.Diff(expected, actual); len(diff) != 0 {
-				t.Error(diff)
-			}
-			return err
+			return core.Diff1(PermissionQuery{}.List(tx, permissionIDs...))(t, expected)
 		}
 	}
 
@@ -182,14 +177,7 @@ func rolePermissionRows(permissions ...RolePermission) *sqlmock.Rows {
 func TestRoleQuery_Get(t *testing.T) {
 	run := func(id string, rexpected *Role, pexpected ...*RolePermission) core.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			ractual, pactual, err := RoleQuery{}.Get(tx, id)
-			if diff := cmp.Diff(rexpected, ractual); len(diff) != 0 {
-				t.Errorf(diff)
-			}
-			if diff := cmp.Diff(pexpected, pactual); len(diff) != 0 {
-				t.Errorf(diff)
-			}
-			return err
+			return core.Diff2(RoleQuery{}.Get(tx, id))(t, rexpected, pexpected)
 		}
 	}
 
@@ -270,14 +258,7 @@ func TestRoleQuery_List(t *testing.T) {
 
 	run := func(parentKey int64, rexpected []*Role, pexpected []*RolePermission) core.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			ractual, pactual, err := RoleQuery{}.List(tx, parentKey, offset, limit)
-			if diff := cmp.Diff(rexpected, ractual); len(diff) != 0 {
-				t.Errorf(diff)
-			}
-			if diff := cmp.Diff(pexpected, pactual); len(diff) != 0 {
-				t.Errorf(diff)
-			}
-			return err
+			return core.Diff2(RoleQuery{}.List(tx, parentKey, offset, limit))(t, rexpected, pexpected)
 		}
 	}
 

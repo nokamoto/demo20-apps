@@ -4,8 +4,6 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
-
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
@@ -93,11 +91,7 @@ func TestQuery_Delete(t *testing.T) {
 func TestQuery_Get(t *testing.T) {
 	run := func(id string, expected *Instance) core.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			actual, err := Query{}.Get(tx, id)
-			if diff := cmp.Diff(expected, actual); len(diff) != 0 {
-				t.Error(diff)
-			}
-			return err
+			return core.Diff1(Query{}.Get(tx, id))(t, expected)
 		}
 	}
 
@@ -143,11 +137,7 @@ func TestQuery_List(t *testing.T) {
 
 	run := func(parentKey int64, expected []*Instance) core.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			actual, err := Query{}.List(tx, parentKey, offset, limit)
-			if diff := cmp.Diff(expected, actual); len(diff) != 0 {
-				t.Error(diff)
-			}
-			return err
+			return core.Diff1(Query{}.List(tx, parentKey, offset, limit))(t, expected)
 		}
 	}
 
