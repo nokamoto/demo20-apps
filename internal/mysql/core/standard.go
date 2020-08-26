@@ -65,7 +65,7 @@ func BulkInsert(tx *gorm.DB, tableName string, records bulkable) error {
 	fields := records.Fields()
 	var escapedFields []string
 	for _, f := range fields {
-		escapedFields = append(escapedFields, "`"+f+"`")
+		escapedFields = append(escapedFields, fmt.Sprintf("`%s`", f))
 	}
 
 	var q []string
@@ -73,7 +73,7 @@ func BulkInsert(tx *gorm.DB, tableName string, records bulkable) error {
 		q = append(q, "?")
 	}
 
-	placeholder := "(" + strings.Join(q, ",") + ")"
+	placeholder := fmt.Sprintf("(%s)", strings.Join(q, ","))
 
 	var placeholders []string
 	var args []interface{}
@@ -87,7 +87,7 @@ func BulkInsert(tx *gorm.DB, tableName string, records bulkable) error {
 		tableName, strings.Join(escapedFields, ","), strings.Join(placeholders, ","),
 	)
 
-	res := tx.Debug().Exec(query+strings.Join(placeholders, ","), args...)
+	res := tx.Debug().Exec(query, args...)
 	if res.Error != nil {
 		return Translate(res.Error)
 	}

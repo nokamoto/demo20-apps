@@ -31,6 +31,17 @@ func (PermissionQuery) List(tx *gorm.DB, permissionIDs ...string) ([]*Permission
 // RoleQuery defines quries for role tables within a transaction.
 type RoleQuery struct{}
 
+func newBulkRolePermission(roleKey int64, permissions ...*Permission) bulkRolePermission {
+	var bulk bulkRolePermission
+	for _, p := range permissions {
+		bulk = append(bulk, &RolePermission{
+			RoleKey:       roleKey,
+			PermissionKey: p.PermissionKey,
+		})
+	}
+	return bulk
+}
+
 // Create inserts role and role-permission records.
 func (q RoleQuery) Create(tx *gorm.DB, role *Role, permissions ...*Permission) error {
 	res := tx.Debug().Create(role)
@@ -38,15 +49,11 @@ func (q RoleQuery) Create(tx *gorm.DB, role *Role, permissions ...*Permission) e
 		return core.Translate(res.Error)
 	}
 
-	var bulk bulkRolePermission
-	for _, p := range permissions {
-		bulk = append(bulk, &RolePermission{
-			RoleKey:       role.RoleKey,
-			PermissionKey: p.PermissionKey,
-		})
-	}
-
-	return core.BulkInsert(tx, RolePermission{}.TableName(), bulk)
+	return core.BulkInsert(
+		tx,
+		RolePermission{}.TableName(),
+		newBulkRolePermission(role.RoleKey, permissions...),
+	)
 }
 
 // Delete deletes role and role-permission records.
@@ -96,41 +103,32 @@ func (q RoleQuery) Update(tx *gorm.DB, role *Role, permissions ...*Permission) e
 		return core.Translate(res.Error)
 	}
 
-	var bulk bulkRolePermission
-	for _, p := range permissions {
-		bulk = append(bulk, &RolePermission{
-			RoleKey:       role.RoleKey,
-			PermissionKey: p.PermissionKey,
-		})
-	}
-
-	return core.BulkInsert(tx, RolePermission{}.TableName(), bulk)
+	return core.BulkInsert(
+		tx,
+		RolePermission{}.TableName(),
+		newBulkRolePermission(role.RoleKey, permissions...),
+	)
 }
 
 // List returns role and role-permission records by the parent key.
 func (RoleQuery) List(tx *gorm.DB, parentKey int64, offset, limit int) ([]*Role, []*RolePermission, error) {
 	var roles []*Role
-	res := tx.Debug().Where("parent_key = ?", parentKey).Offset(offset).Limit(limit).Find(&roles)
-	if res.Error != nil {
-		return nil, nil, core.Translate(res.Error)
+	err := core.List(tx, &roles, offset, limit, "parent_key = ?", parentKey)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	if len(roles) == 0 {
 		return nil, nil, nil
 	}
 
-	var keys []int64
+	var keys []interface{}
 	for _, r := range roles {
 		keys = append(keys, r.RoleKey)
 	}
 
 	var permissions []*RolePermission
-	res = tx.Debug().Where("role_key in (?)", keys).Find(&permissions)
-	if res.Error != nil {
-		return nil, nil, core.Translate(res.Error)
-	}
-
-	return roles, permissions, nil
+	return roles, permissions, core.ListAll(tx, &permissions, "role_key in (?)", keys...)
 }
 
 // RoleBindingQuery defines queries for a role binding table within a transaction.
