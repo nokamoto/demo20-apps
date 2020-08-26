@@ -2,6 +2,7 @@ package iam
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 	"github.com/nokamoto/demo20-apps/internal/mysql/core"
@@ -31,29 +32,41 @@ func (PermissionQuery) List(tx *gorm.DB, permissionIDs ...string) ([]*Permission
 // RoleQuery defines quries for role tables within a transaction.
 type RoleQuery struct{}
 
-// Create inserts role and role-permission records.
-func (RoleQuery) Create(tx *gorm.DB, role *Role, permissions ...*Permission) error {
-	res := tx.Debug().Create(role)
-	if res.Error != nil {
-		return core.Translate(res.Error)
-	}
-
+func (RoleQuery) bulkInsertPermissions(tx *gorm.DB, roleKey int64, permissionKeys ...int64) error {
 	var placeholders []string
 	var args []interface{}
-	for _, p := range permissions {
+	for _, p := range permissionKeys {
 		placeholders = append(placeholders, "(?,?)")
-		args = append(args, role.RoleKey)
-		args = append(args, p.PermissionKey)
+		args = append(args, roleKey)
+		args = append(args, p)
 	}
 
-	query := fmt.Sprintf("INSERT INTO `iam_role_permission` (`role_key`,`permission_key`) VALUES %s", strings.Join(placeholcers, ","))
+	query := fmt.Sprintf(
+		"INSERT INTO `iam_role_permission` (`role_key`,`permission_key`) VALUES %s",
+		strings.Join(placeholders, ","),
+	)
 
-	res = tx.Debug().Exec(query, rps)
+	res := tx.Debug().Exec(query, args...)
 	if res.Error != nil {
 		return core.Translate(res.Error)
 	}
 
 	return nil
+}
+
+// Create inserts role and role-permission records.
+func (q RoleQuery) Create(tx *gorm.DB, role *Role, permissions ...*Permission) error {
+	res := tx.Debug().Create(role)
+	if res.Error != nil {
+		return core.Translate(res.Error)
+	}
+
+	var keys []int64
+	for _, p := range permissions {
+		keys = append(keys, p.PermissionKey)
+	}
+
+	return q.bulkInsertPermissions(tx, role.RoleKey, keys...)
 }
 
 // Delete deletes role and role-permission records.
@@ -92,7 +105,7 @@ func (RoleQuery) Get(tx *gorm.DB, id string) (*Role, []*RolePermission, error) {
 }
 
 // Update updates role and role-permission records.
-func (RoleQuery) Update(tx *gorm.DB, role *Role, permissions []*RolePermission) error {
+func (q RoleQuery) Update(tx *gorm.DB, role *Role, permissions ...*Permission) error {
 	res := tx.Debug().Save(role)
 	if res.Error != nil {
 		return core.Translate(res.Error)
@@ -103,12 +116,12 @@ func (RoleQuery) Update(tx *gorm.DB, role *Role, permissions []*RolePermission) 
 		return core.Translate(res.Error)
 	}
 
-	res = tx.Debug().Create(&permissions)
-	if res.Error != nil {
-		return core.Translate(res.Error)
+	var keys []int64
+	for _, p := range permissions {
+		keys = append(keys, p.PermissionKey)
 	}
 
-	return nil
+	return q.bulkInsertPermissions(tx, role.RoleKey, keys...)
 }
 
 // List returns role and role-permission records by the parent key.

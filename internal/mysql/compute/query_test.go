@@ -113,9 +113,11 @@ func TestQuery_Get(t *testing.T) {
 			Name: "OK",
 			Run:  run("foo", &instance),
 			Mock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `compute_instance` WHERE (instance_id = ?) LIMIT 1")).
 					WithArgs("foo").
 					WillReturnRows(rows(instance))
+				mock.ExpectCommit()
 			},
 			Check: core.Succeeded,
 		},
@@ -123,9 +125,11 @@ func TestQuery_Get(t *testing.T) {
 			Name: "NotFound",
 			Run:  run("foo", &Instance{}),
 			Mock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `compute_instance` WHERE (instance_id = ?) LIMIT 1")).
 					WithArgs("foo").
 					WillReturnRows(rows())
+				mock.ExpectRollback()
 			},
 			Check: core.Failed(core.ErrNotFound),
 		},
@@ -166,9 +170,11 @@ func TestQuery_List(t *testing.T) {
 			Name: "OK empty",
 			Run:  run(3000, []*Instance{}),
 			Mock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `compute_instance`  WHERE (parent_key = ?) LIMIT 200 OFFSET 100")).
 					WithArgs(3000).
 					WillReturnRows(rows())
+				mock.ExpectCommit()
 			},
 			Check: core.Succeeded,
 		},
@@ -176,9 +182,11 @@ func TestQuery_List(t *testing.T) {
 			Name: "OK",
 			Run:  run(3000, []*Instance{&foo, &bar}),
 			Mock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `compute_instance`  WHERE (parent_key = ?) LIMIT 200 OFFSET 100")).
 					WithArgs(3000).
 					WillReturnRows(rows(foo, bar))
+				mock.ExpectCommit()
 			},
 			Check: core.Succeeded,
 		},

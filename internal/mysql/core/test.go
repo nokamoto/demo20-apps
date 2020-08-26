@@ -67,7 +67,9 @@ func (xs TestCases) Run(t *testing.T) {
 				t.Fatal("no execution")
 			}
 
-			err = x.Run(t, g)
+			err = g.Transaction(func(tx *gorm.DB) error {
+				return x.Run(t, tx)
+			})
 
 			if x.Check == nil {
 				t.Fatal("no check")
