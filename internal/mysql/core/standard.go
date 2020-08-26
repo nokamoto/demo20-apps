@@ -94,3 +94,12 @@ func BulkInsert(tx *gorm.DB, tableName string, records bulkable) error {
 
 	return nil
 }
+
+// Update updates the record.
+func Update(tx *gorm.DB, record interface{}) error {
+	res := tx.Debug().Save(record)
+	if res.Error != nil {
+		return Translate(res.Error)
+	}
+	return nil
+}
