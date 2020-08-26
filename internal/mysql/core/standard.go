@@ -1,6 +1,9 @@
 package core
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -40,5 +43,54 @@ func List(tx *gorm.DB, records interface{}, offset, limit int, where string, arg
 	if res.Error != nil {
 		return Translate(res.Error)
 	}
+	return nil
+}
+
+// ListAll finds all records by the condition(s).
+func ListAll(tx *gorm.DB, records interface{}, where string, args ...interface{}) error {
+	res := tx.Debug().Where(where, args).Find(records)
+	if res.Error != nil {
+		return Translate(res.Error)
+	}
+	return nil
+}
+
+type bulkable interface {
+	Args() [][]interface{}
+	Fields() []string
+}
+
+// BulkInsert inserts multiple recoreds.
+func BulkInsert(tx *gorm.DB, tableName string, records bulkable) error {
+	fields := records.Fields()
+	var escapedFields []string
+	for _, f := range fields {
+		escapedFields = append(escapedFields, "`"+f+"`")
+	}
+
+	var q []string
+	for i := 0; i < len(fields); i++ {
+		q = append(q, "?")
+	}
+
+	placeholder := "(" + strings.Join(q, ",") + ")"
+
+	var placeholders []string
+	var args []interface{}
+	for _, r := range records.Args() {
+		placeholders = append(placeholders, placeholder)
+		args = append(args, r...)
+	}
+
+	query := fmt.Sprintf(
+		"INSERT INTO `%s` (%s) VALUES %s",
+		tableName, strings.Join(escapedFields, ","), strings.Join(placeholders, ","),
+	)
+
+	res := tx.Debug().Exec(query+strings.Join(placeholders, ","), args...)
+	if res.Error != nil {
+		return Translate(res.Error)
+	}
+
 	return nil
 }

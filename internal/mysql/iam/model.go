@@ -35,6 +35,23 @@ func (RolePermission) TableName() string {
 	return "iam_role_permission"
 }
 
+type bulkRolePermission []*RolePermission
+
+func (xs bulkRolePermission) Args() [][]interface{} {
+	var res [][]interface{}
+	for _, x := range xs {
+		var args []interface{}
+		args = append(args, x.RoleKey)
+		args = append(args, x.PermissionKey)
+		res = append(res, args)
+	}
+	return res
+}
+
+func (xs bulkRolePermission) Fields() []string {
+	return []string{"role_key", "permission_key"}
+}
+
 // RoleBinding represents a role_binding table.
 type RoleBinding struct {
 	RoleKey   int64  `gorm:"column:role_key"`

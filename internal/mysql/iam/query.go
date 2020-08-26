@@ -2,7 +2,6 @@ package iam
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/jinzhu/gorm"
 	"github.com/nokamoto/demo20-apps/internal/mysql/core"
@@ -32,28 +31,6 @@ func (PermissionQuery) List(tx *gorm.DB, permissionIDs ...string) ([]*Permission
 // RoleQuery defines quries for role tables within a transaction.
 type RoleQuery struct{}
 
-func (RoleQuery) bulkInsertPermissions(tx *gorm.DB, roleKey int64, permissionKeys ...int64) error {
-	var placeholders []string
-	var args []interface{}
-	for _, p := range permissionKeys {
-		placeholders = append(placeholders, "(?,?)")
-		args = append(args, roleKey)
-		args = append(args, p)
-	}
-
-	query := fmt.Sprintf(
-		"INSERT INTO `iam_role_permission` (`role_key`,`permission_key`) VALUES %s",
-		strings.Join(placeholders, ","),
-	)
-
-	res := tx.Debug().Exec(query, args...)
-	if res.Error != nil {
-		return core.Translate(res.Error)
-	}
-
-	return nil
-}
-
 // Create inserts role and role-permission records.
 func (q RoleQuery) Create(tx *gorm.DB, role *Role, permissions ...*Permission) error {
 	res := tx.Debug().Create(role)
@@ -61,12 +38,15 @@ func (q RoleQuery) Create(tx *gorm.DB, role *Role, permissions ...*Permission) e
 		return core.Translate(res.Error)
 	}
 
-	var keys []int64
+	var bulk bulkRolePermission
 	for _, p := range permissions {
-		keys = append(keys, p.PermissionKey)
+		bulk = append(bulk, &RolePermission{
+			RoleKey:       role.RoleKey,
+			PermissionKey: p.PermissionKey,
+		})
 	}
 
-	return q.bulkInsertPermissions(tx, role.RoleKey, keys...)
+	return core.BulkInsert(tx, RolePermission{}.TableName(), bulk)
 }
 
 // Delete deletes role and role-permission records.
@@ -116,12 +96,15 @@ func (q RoleQuery) Update(tx *gorm.DB, role *Role, permissions ...*Permission) e
 		return core.Translate(res.Error)
 	}
 
-	var keys []int64
+	var bulk bulkRolePermission
 	for _, p := range permissions {
-		keys = append(keys, p.PermissionKey)
+		bulk = append(bulk, &RolePermission{
+			RoleKey:       role.RoleKey,
+			PermissionKey: p.PermissionKey,
+		})
 	}
 
-	return q.bulkInsertPermissions(tx, role.RoleKey, keys...)
+	return core.BulkInsert(tx, RolePermission{}.TableName(), bulk)
 }
 
 // List returns role and role-permission records by the parent key.
