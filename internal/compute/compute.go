@@ -3,6 +3,7 @@ package compute
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"strings"
 
 	"github.com/jinzhu/gorm"
@@ -17,6 +18,18 @@ type Compute struct {
 	instanceQuery instanceQuery
 	projectQuery  projectQuery
 	db            *gorm.DB
+}
+
+// RandomName returns a genrated name randomly from the parent id.
+func (c *Compute) RandomName(parentID string) string {
+	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
+
+	b := make([]rune, 8)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+
+	return fmt.Sprintf("%s-%s", parentID, string(b))
 }
 
 // Create creates a new compute instance.
