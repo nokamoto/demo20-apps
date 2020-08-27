@@ -1,9 +1,16 @@
-all: internal/compute/mock/mock.go
-	go install golang.org/x/tools/cmd/goimports
+all: mockgen goimports internal/compute/mock/mock.go internal/service/compute/mock/mock.go
 	goimports -d -w $$(find . -type f -name '*.go' -not -path '*/mock.go')
 	go test ./...
 	go mod tidy
 
-internal/compute/mock/mock.go: internal/compute/query.go
+goimports:
+	go install golang.org/x/tools/cmd/goimports
+
+mockgen:
 	go install github.com/golang/mock/mockgen
-	mockgen -source=internal/compute/query.go -destination internal/compute/mock/mock.go -package mock
+
+internal/compute/mock/mock.go: internal/compute/query.go
+	mockgen -source=$< -destination $@ -package mock
+
+internal/service/compute/mock/mock.go: internal/service/compute/compute.go
+	mockgen -source=$< -destination $@ -package mock
