@@ -4,6 +4,9 @@ import (
 	"errors"
 	"testing"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"github.com/google/go-cmp/cmp"
@@ -25,6 +28,16 @@ func Failed(expected error) Check {
 	return func(t *testing.T, actual error) {
 		t.Helper()
 		if !errors.Is(actual, expected) {
+			t.Errorf("expected %v but actual %v", expected, actual)
+		}
+	}
+}
+
+// Code asserts that err has the expected code.
+func Code(expected codes.Code) Check {
+	return func(t *testing.T, err error) {
+		t.Helper()
+		if actual := status.Code(err); actual != expected {
 			t.Errorf("expected %v but actual %v", expected, actual)
 		}
 	}
