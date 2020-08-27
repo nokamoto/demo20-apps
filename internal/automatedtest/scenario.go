@@ -7,7 +7,7 @@ import (
 // Scenario represents an automated test case.
 type Scenario struct {
 	Name string
-	Run  func(State) (State, error)
+	Run  func(State, *zap.Logger) (State, error)
 }
 
 // State represents a state of automated test cases.
@@ -25,7 +25,7 @@ func (xs Scenarios) run(logger *zap.Logger) {
 
 		scoped.Info("run")
 
-		updated, err := x.Run(state)
+		updated, err := x.Run(state, scoped)
 		if err != nil {
 			scoped.Info("failed", zap.Error(err))
 		}

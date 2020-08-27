@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"go.uber.org/zap"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
@@ -20,7 +22,7 @@ func main() {
 		return automatedtest.Scenarios{
 			{
 				Name: "create an instance",
-				Run: func(state automatedtest.State) (automatedtest.State, error) {
+				Run: func(state automatedtest.State, _ *zap.Logger) (automatedtest.State, error) {
 					res, err := c.CreateInstance(context.Background(), &v1alpha.CreateInstanceRequest{
 						Instance: &v1alpha.Instance{
 							Labels: []string{"foo", "bar"},
