@@ -6,7 +6,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/mock v1.4.3
-	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.2
 	github.com/jinzhu/gorm v1.9.16
 	github.com/kr/text v0.2.0 // indirect
