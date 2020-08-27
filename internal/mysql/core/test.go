@@ -1,10 +1,9 @@
 package core
 
 import (
-	"errors"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/nokamoto/demo20-apps/internal/test"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
@@ -15,32 +14,11 @@ type TestCase struct {
 	Name  string
 	Run   Run
 	Mock  func(sqlmock.Sqlmock)
-	Check Check
+	Check test.Check
 }
 
 // Run represents a test execution.
 type Run func(*testing.T, *gorm.DB) error
-
-// Check represents an assertion of TestCase.
-type Check func(*testing.T, error)
-
-// Succeeded asserts that err is nil.
-func Succeeded(t *testing.T, err error) {
-	t.Helper()
-	if err != nil {
-		t.Errorf("expected no error: %v", err)
-	}
-}
-
-// Failed asserts that err is expected.
-func Failed(expected error) Check {
-	return func(t *testing.T, actual error) {
-		t.Helper()
-		if !errors.Is(actual, expected) {
-			t.Errorf("expected %v but actual %v", expected, actual)
-		}
-	}
-}
 
 // TestCases represents a list of TestCase.
 type TestCases []TestCase
@@ -84,28 +62,5 @@ func (xs TestCases) Run(t *testing.T) {
 				t.Error(err)
 			}
 		})
-	}
-}
-
-// Diff1 asserts that a1 is equal to e1.
-func Diff1(a1 interface{}, err error) func(*testing.T, interface{}) error {
-	return func(t *testing.T, e1 interface{}) error {
-		if diff := cmp.Diff(e1, a1); len(diff) != 0 {
-			t.Error(diff)
-		}
-		return err
-	}
-}
-
-// Diff2 asserts that a1 is equal to e1, and so on.
-func Diff2(a1, a2 interface{}, err error) func(*testing.T, interface{}, interface{}) error {
-	return func(t *testing.T, e1, e2 interface{}) error {
-		if diff := cmp.Diff(e1, a1); len(diff) != 0 {
-			t.Error(diff)
-		}
-		if diff := cmp.Diff(e2, a2); len(diff) != 0 {
-			t.Error(diff)
-		}
-		return err
 	}
 }

@@ -4,6 +4,8 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/nokamoto/demo20-apps/internal/test"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
@@ -44,7 +46,7 @@ func TestQuery_Create(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(1000, 1))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 		{
 			Name: "AlreadyExists",
@@ -56,7 +58,7 @@ func TestQuery_Create(t *testing.T) {
 					WillReturnError(&mysql.MySQLError{Number: core.DupEntry})
 				mock.ExpectRollback()
 			},
-			Check: core.Failed(core.ErrAlreadyExists),
+			Check: test.Failed(core.ErrAlreadyExists),
 		},
 	}
 
@@ -81,7 +83,7 @@ func TestQuery_Delete(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(0, 1))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
@@ -91,7 +93,7 @@ func TestQuery_Delete(t *testing.T) {
 func TestQuery_Get(t *testing.T) {
 	run := func(id string, expected *Instance) core.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			return core.Diff1(Query{}.Get(tx, id))(t, expected)
+			return test.Diff1(Query{}.Get(tx, id))(t, expected)
 		}
 	}
 
@@ -113,7 +115,7 @@ func TestQuery_Get(t *testing.T) {
 					WillReturnRows(rows(instance))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 		{
 			Name: "NotFound",
@@ -125,7 +127,7 @@ func TestQuery_Get(t *testing.T) {
 					WillReturnRows(rows())
 				mock.ExpectRollback()
 			},
-			Check: core.Failed(core.ErrNotFound),
+			Check: test.Failed(core.ErrNotFound),
 		},
 	}
 
@@ -137,7 +139,7 @@ func TestQuery_List(t *testing.T) {
 
 	run := func(parentKey int64, expected []*Instance) core.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			return core.Diff1(Query{}.List(tx, parentKey, offset, limit))(t, expected)
+			return test.Diff1(Query{}.List(tx, parentKey, offset, limit))(t, expected)
 		}
 	}
 
@@ -166,7 +168,7 @@ func TestQuery_List(t *testing.T) {
 					WillReturnRows(rows())
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 		{
 			Name: "OK",
@@ -178,7 +180,7 @@ func TestQuery_List(t *testing.T) {
 					WillReturnRows(rows(foo, bar))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
