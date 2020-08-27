@@ -4,6 +4,8 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/nokamoto/demo20-apps/internal/test"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
 	"github.com/nokamoto/demo20-apps/internal/mysql/core"
@@ -31,7 +33,7 @@ func TestPermissionQuery_Create(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(1000, 1))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
@@ -51,7 +53,7 @@ func TestPermissionQuery_List(t *testing.T) {
 
 	run := func(permissionIDs []string, expected []*Permission) core.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			return core.Diff1(PermissionQuery{}.List(tx, permissionIDs...))(t, expected)
+			return test.Diff1(PermissionQuery{}.List(tx, permissionIDs...))(t, expected)
 		}
 	}
 
@@ -76,7 +78,7 @@ func TestPermissionQuery_List(t *testing.T) {
 					WillReturnRows(rows(foo, bar))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
@@ -115,7 +117,7 @@ func TestRoleQuery_Create(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(2000, 1))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
@@ -147,7 +149,7 @@ func TestRoleQuery_Delete(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(0, 1))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
@@ -177,7 +179,7 @@ func rolePermissionRows(permissions ...RolePermission) *sqlmock.Rows {
 func TestRoleQuery_Get(t *testing.T) {
 	run := func(id string, rexpected *Role, pexpected ...*RolePermission) core.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			return core.Diff2(RoleQuery{}.Get(tx, id))(t, rexpected, pexpected)
+			return test.Diff2(RoleQuery{}.Get(tx, id))(t, rexpected, pexpected)
 		}
 	}
 
@@ -204,7 +206,7 @@ func TestRoleQuery_Get(t *testing.T) {
 					WillReturnRows(rolePermissionRows(permission))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
@@ -246,7 +248,7 @@ func TestRoleQuery_Update(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(3000, 1))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
@@ -258,7 +260,7 @@ func TestRoleQuery_List(t *testing.T) {
 
 	run := func(parentKey int64, rexpected []*Role, pexpected []*RolePermission) core.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			return core.Diff2(RoleQuery{}.List(tx, parentKey, offset, limit))(t, rexpected, pexpected)
+			return test.Diff2(RoleQuery{}.List(tx, parentKey, offset, limit))(t, rexpected, pexpected)
 		}
 	}
 
@@ -285,7 +287,7 @@ func TestRoleQuery_List(t *testing.T) {
 					WillReturnRows(rolePermissionRows(permission))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 

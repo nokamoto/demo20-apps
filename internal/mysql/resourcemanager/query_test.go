@@ -4,6 +4,8 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/nokamoto/demo20-apps/internal/test"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
 	"github.com/nokamoto/demo20-apps/internal/mysql/core"
@@ -32,7 +34,7 @@ func TestQuery_Create(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(1000, 1))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
@@ -57,7 +59,7 @@ func TestQuery_Delete(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(1000, 1))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
@@ -88,7 +90,7 @@ func TestQuery_Update(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(1000, 1))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
@@ -108,7 +110,7 @@ func TestQuery_Get(t *testing.T) {
 
 	run := func(id string, expected *Project) core.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			return core.Diff1(Query{}.Get(tx, id))(t, expected)
+			return test.Diff1(Query{}.Get(tx, id))(t, expected)
 		}
 	}
 
@@ -129,7 +131,7 @@ func TestQuery_Get(t *testing.T) {
 					WillReturnRows(rows(project))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 

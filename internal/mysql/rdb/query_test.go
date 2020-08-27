@@ -4,6 +4,8 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/nokamoto/demo20-apps/internal/test"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/go-cmp/cmp"
 	"github.com/jinzhu/gorm"
@@ -37,7 +39,7 @@ func TestQuery_Create(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(2000, 1))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
@@ -69,7 +71,7 @@ func TestQuery_Delete(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(2000, 1))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
@@ -99,14 +101,7 @@ func instanceRows(xs ...ClusterInstance) *sqlmock.Rows {
 func TestQuery_Get(t *testing.T) {
 	run := func(id string, cexpected *Cluster, iexpected []*ClusterInstance) core.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			cactual, iactual, err := Query{}.Get(tx, id)
-			if diff := cmp.Diff(cexpected, cactual); len(diff) != 0 {
-				t.Error(diff)
-			}
-			if diff := cmp.Diff(iexpected, iactual); len(diff) != 0 {
-				t.Error(diff)
-			}
-			return err
+			return test.Diff2(Query{}.Get(tx, id))(t, cexpected, iexpected)
 		}
 	}
 
@@ -134,7 +129,7 @@ func TestQuery_Get(t *testing.T) {
 					WillReturnRows(instanceRows(instance))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
@@ -182,7 +177,7 @@ func TestQuery_List(t *testing.T) {
 					WillReturnRows(instanceRows(instance))
 				mock.ExpectCommit()
 			},
-			Check: core.Succeeded,
+			Check: test.Succeeded,
 		},
 	}
 
