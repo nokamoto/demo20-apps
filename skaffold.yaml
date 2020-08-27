@@ -8,6 +8,10 @@ build:
     docker:
       buildArgs:
         cmd: compute
+  - image: compute-automated-test
+    docker:
+      buildArgs:
+        cmd: compute-automated-test
   - image: iam
     docker:
       buildArgs:

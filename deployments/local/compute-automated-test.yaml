@@ -1,0 +1,18 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: compute-automated-test
+spec:
+  template:
+    spec:
+      containers:
+      - image: compute-automated-test
+        name: compute-automated-test
+        env:
+        - name: LOGGER_DEBUG
+          value: "1"
+        - name: GRPC_ADDRESS
+          value: compute:9000
+      restartPolicy: Never
+  backoffLimit: 3
