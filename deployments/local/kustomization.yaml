@@ -1,5 +1,6 @@
 resources:
 - compute.yaml
+- compute-automated-test.yaml
 - iam.yaml
 - rdb.yaml
 - resourcemanager.yaml

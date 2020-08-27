@@ -1,0 +1,7 @@
+resources:
+- mysql.yaml
+
+configMapGenerator:
+- name: sql-files
+  files:
+  - init.sql
