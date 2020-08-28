@@ -5,16 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"google.golang.org/protobuf/testing/protocmp"
-
-	"go.uber.org/zap"
-
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
-
 	"github.com/nokamoto/demo20-apis/cloud/compute/v1alpha"
 	"github.com/nokamoto/demo20-apps/internal/automatedtest"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
 func main() {
@@ -24,7 +20,7 @@ func main() {
 		return automatedtest.Scenarios{
 			{
 				Name: "create an instance",
-				Run: func(state automatedtest.State, _ *zap.Logger) (automatedtest.State, error) {
+				Run: func(state automatedtest.State, logger *zap.Logger) (automatedtest.State, error) {
 					res, err := c.CreateInstance(context.Background(), &v1alpha.CreateInstanceRequest{
 						Instance: &v1alpha.Instance{
 							Labels: []string{"foo", "bar"},
@@ -38,14 +34,16 @@ func main() {
 						return nil, fmt.Errorf("unexpected prefix: %v", res)
 					}
 
-					ignoreField := cmpopts.IgnoreFields(v1alpha.Instance{}, "Name")
+					logger.Debug("ignore fields", zap.String("name", res.GetName()))
+					res.Name = ""
 
 					expected := &v1alpha.Instance{
 						Parent: "projects/todo",
 						Labels: []string{"foo", "bar"},
 					}
 
-					if diff := cmp.Diff(expected, res, ignoreField, protocmp.Transform()); len(diff) != 0 {
+					if diff := cmp.Diff(expected, res, protocmp.Transform()); len(diff) != 0 {
+						fmt.Println(diff)
 						return nil, fmt.Errorf("unexpected response: %s", diff)
 					}
 
