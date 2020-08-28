@@ -27,7 +27,7 @@ func (xs Scenarios) run(logger *zap.Logger) {
 
 		updated, err := x.Run(state, scoped)
 		if err != nil {
-			scoped.Info("failed", zap.Error(err))
+			scoped.Fatal("failed", zap.Error(err))
 		}
 
 		scoped.Info("succeeded")
