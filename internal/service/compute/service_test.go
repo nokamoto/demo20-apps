@@ -56,9 +56,7 @@ func (xs testCases) run(t *testing.T) {
 func Test_service_CreateInstance(t *testing.T) {
 	run := func(req *v1alpha.CreateInstanceRequest, expected *v1alpha.Instance) func(*testing.T, *service) error {
 		return func(t *testing.T, s *service) error {
-			return test.Diff1IgnoreUnexported(s.CreateInstance(context.Background(), req))(
-				t, expected, v1alpha.Instance{},
-			)
+			return test.Diff1IgnoreUnexported(s.CreateInstance(context.Background(), req))(t, expected)
 		}
 	}
 

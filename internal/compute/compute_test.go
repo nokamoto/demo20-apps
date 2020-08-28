@@ -82,7 +82,7 @@ func commit(mock sqlmock.Sqlmock) {
 func TestCompute_Create(t *testing.T) {
 	run := func(id, projectID string, req, expected *v1alpha.Instance) func(*testing.T, Compute) error {
 		return func(t *testing.T, c Compute) error {
-			return test.Diff1IgnoreUnexported(c.Create(id, projectID, req))(t, expected, v1alpha.Instance{})
+			return test.Diff1IgnoreUnexported(c.Create(id, projectID, req))(t, expected)
 		}
 	}
 
