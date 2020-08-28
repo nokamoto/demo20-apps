@@ -4,10 +4,10 @@ import (
 	"errors"
 	"testing"
 
+	"google.golang.org/protobuf/testing/protocmp"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"github.com/google/go-cmp/cmp"
 )
@@ -53,10 +53,10 @@ func Diff1(a1 interface{}, err error) func(*testing.T, interface{}) error {
 	}
 }
 
-// Diff1IgnoreUnexported asserts that a1 is equal to e1 with IgnoreUnexported.
-func Diff1IgnoreUnexported(a1 interface{}, err error) func(*testing.T, interface{}, interface{}) error {
-	return func(t *testing.T, e1 interface{}, typ interface{}) error {
-		if diff := cmp.Diff(e1, a1, cmpopts.IgnoreUnexported(typ)); len(diff) != 0 {
+// Diff1IgnoreUnexported asserts that a1 is equal to e1 with protocmp.Transform.
+func Diff1IgnoreUnexported(a1 interface{}, err error) func(*testing.T, interface{}) error {
+	return func(t *testing.T, e1 interface{}) error {
+		if diff := cmp.Diff(e1, a1, protocmp.Transform()); len(diff) != 0 {
 			t.Error(diff)
 		}
 		return err

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"google.golang.org/protobuf/testing/protocmp"
+
 	"go.uber.org/zap"
 
 	"github.com/google/go-cmp/cmp"
@@ -37,14 +39,13 @@ func main() {
 					}
 
 					ignoreField := cmpopts.IgnoreFields(v1alpha.Instance{}, "Name")
-					ignoreUnexported := cmpopts.IgnoreUnexported(v1alpha.Instance{})
 
 					expected := &v1alpha.Instance{
 						Parent: "projects/todo",
 						Labels: []string{"foo", "bar"},
 					}
 
-					if diff := cmp.Diff(expected, res, ignoreField, ignoreUnexported); len(diff) != 0 {
+					if diff := cmp.Diff(expected, res, ignoreField, protocmp.Transform()); len(diff) != 0 {
 						return nil, fmt.Errorf("unexpected response: %s", diff)
 					}
 
