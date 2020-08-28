@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"google.golang.org/protobuf/testing/protocmp"
-	"go.uber.org/zap"
 	"github.com/google/go-cmp/cmp"
 	"github.com/nokamoto/demo20-apis/cloud/compute/v1alpha"
 	"github.com/nokamoto/demo20-apps/internal/automatedtest"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
 func main() {
