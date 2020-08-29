@@ -1,9 +1,10 @@
 package main
 
 import (
-	"google.golang.org/protobuf/testing/protocmp"
 	"context"
 	"fmt"
+
+	"google.golang.org/protobuf/testing/protocmp"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/nokamoto/demo20-apis/cloud/iam/v1alpha"
