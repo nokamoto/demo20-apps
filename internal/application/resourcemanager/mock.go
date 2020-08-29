@@ -34,6 +34,20 @@ func (m *MockprojectQuery) EXPECT() *MockprojectQueryMockRecorder {
 	return m.recorder
 }
 
+// Create mocks base method
+func (m *MockprojectQuery) Create(tx *gorm.DB, project *resourcemanager.Project) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", tx, project)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Create indicates an expected call of Create
+func (mr *MockprojectQueryMockRecorder) Create(tx, project interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockprojectQuery)(nil).Create), tx, project)
+}
+
 // Get mocks base method
 func (m *MockprojectQuery) Get(tx *gorm.DB, id string) (*resourcemanager.Project, error) {
 	m.ctrl.T.Helper()

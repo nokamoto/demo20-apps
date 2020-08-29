@@ -7,5 +7,6 @@ import (
 )
 
 type projectQuery interface {
+	Create(tx *gorm.DB, project *resourcemanager.Project) error
 	Get(tx *gorm.DB, id string) (*resourcemanager.Project, error)
 }
