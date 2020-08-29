@@ -1,7 +1,6 @@
 package compute
 
 import (
-	"errors"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -9,7 +8,6 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/nokamoto/demo20-apis/cloud/compute/v1alpha"
 	"github.com/nokamoto/demo20-apps/internal/application"
-	"github.com/nokamoto/demo20-apps/internal/mysql"
 	"github.com/nokamoto/demo20-apps/internal/mysql/compute"
 	"github.com/nokamoto/demo20-apps/internal/mysql/resourcemanager"
 )
@@ -46,11 +44,10 @@ func (c *Compute) RandomName(parentID string) string {
 func (c *Compute) Create(id, parentID string, instance *v1alpha.Instance) (*v1alpha.Instance, error) {
 	err := c.db.Transaction(func(tx *gorm.DB) error {
 		project, err := c.projectQuery.Get(tx, parentID)
-		if errors.Is(err, mysql.ErrNotFound) {
-			return fmt.Errorf("%s: %w", parentID, application.ErrNotFound)
-		}
 		if err != nil {
-			return err
+			return application.Error(err, application.ErrorMap{
+				application.NotFound: parentID,
+			})
 		}
 
 		return c.instanceQuery.Create(tx, &compute.Instance{

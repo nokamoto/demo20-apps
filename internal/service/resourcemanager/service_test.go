@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/nokamoto/demo20-apis/cloud/resourcemanager/v1alpha"
-
 	"github.com/golang/mock/gomock"
+	"github.com/nokamoto/demo20-apis/cloud/resourcemanager/v1alpha"
 	"github.com/nokamoto/demo20-apps/internal/test"
 	"go.uber.org/zap/zaptest"
 )
@@ -60,6 +59,43 @@ func Test_service_GetProject(t *testing.T) {
 			),
 			mock: func(r *Mockresourcemanager) {
 				r.EXPECT().Get("foo").Return(&v1alpha.Project{
+					Name:        "projects/foo",
+					DisplayName: "foo display name",
+				}, nil)
+			},
+			check: test.Succeeded,
+		},
+	}
+
+	xs.run(t)
+}
+
+func Test_service_CreateProject(t *testing.T) {
+	run := func(req *v1alpha.CreateProjectRequest, expected *v1alpha.Project) func(*testing.T, *service) error {
+		return func(t *testing.T, s *service) error {
+			return test.Diff1IgnoreUnexported(s.CreateProject(context.Background(), req))(t, expected)
+		}
+	}
+
+	xs := testCases{
+		{
+			name: "OK",
+			run: run(
+				&v1alpha.CreateProjectRequest{
+					ProjectId: "foo",
+					Project: &v1alpha.Project{
+						DisplayName: "foo display name",
+					},
+				},
+				&v1alpha.Project{
+					Name:        "projects/foo",
+					DisplayName: "foo display name",
+				},
+			),
+			mock: func(r *Mockresourcemanager) {
+				r.EXPECT().Create("foo", test.ProtoEq(&v1alpha.Project{
+					DisplayName: "foo display name",
+				})).Return(&v1alpha.Project{
 					Name:        "projects/foo",
 					DisplayName: "foo display name",
 				}, nil)

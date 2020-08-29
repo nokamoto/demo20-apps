@@ -47,3 +47,18 @@ func (mr *MockresourcemanagerMockRecorder) Get(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*Mockresourcemanager)(nil).Get), arg0)
 }
+
+// Create mocks base method
+func (m *Mockresourcemanager) Create(id string, project *v1alpha.Project) (*v1alpha.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", id, project)
+	ret0, _ := ret[0].(*v1alpha.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create
+func (mr *MockresourcemanagerMockRecorder) Create(id, project interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*Mockresourcemanager)(nil).Create), id, project)
+}

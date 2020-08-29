@@ -21,7 +21,7 @@ func (xs Scenarios) run(logger *zap.Logger) {
 	state := make(State)
 
 	for i, x := range xs {
-		scoped := logger.With(zap.String("name", x.Name), zap.Int("number", i))
+		scoped := logger.With(zap.String("name", x.Name), zap.Int("number", i), zap.Any("state", state))
 
 		scoped.Info("run")
 

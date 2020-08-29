@@ -1,7 +1,6 @@
 package resourcemanager
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/nokamoto/demo20-apps/internal/mysql/resourcemanager"
@@ -9,7 +8,6 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/nokamoto/demo20-apis/cloud/resourcemanager/v1alpha"
 	"github.com/nokamoto/demo20-apps/internal/application"
-	"github.com/nokamoto/demo20-apps/internal/mysql"
 )
 
 // ResourceManager defines a business logic for the cloud resource manager service.
@@ -31,8 +29,10 @@ func (r *ResourceManager) Get(id string) (*v1alpha.Project, error) {
 	var project v1alpha.Project
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		res, err := r.projectQuery.Get(tx, id)
-		if errors.Is(err, mysql.ErrNotFound) {
-			return fmt.Errorf("%s: %w", id, application.ErrNotFound)
+		if err != nil {
+			return application.Error(err, application.ErrorMap{
+				application.NotFound: id,
+			})
 		}
 
 		project = v1alpha.Project{
@@ -43,4 +43,28 @@ func (r *ResourceManager) Get(id string) (*v1alpha.Project, error) {
 		return nil
 	})
 	return &project, err
+}
+
+// Create creates a project.
+func (r *ResourceManager) Create(id string, project *v1alpha.Project) (*v1alpha.Project, error) {
+	var res v1alpha.Project
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		err := r.projectQuery.Create(tx, &resourcemanager.Project{
+			ProjectID:   id,
+			DisplayName: project.GetDisplayName(),
+		})
+		if err != nil {
+			return application.Error(err, application.ErrorMap{
+				application.AlreadyExists: id,
+			})
+		}
+
+		res = v1alpha.Project{
+			Name:        fmt.Sprintf("projects/%s", id),
+			DisplayName: project.GetDisplayName(),
+		}
+
+		return nil
+	})
+	return &res, err
 }

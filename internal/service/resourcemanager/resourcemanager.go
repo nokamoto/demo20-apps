@@ -7,4 +7,5 @@ import (
 
 type resourcemanager interface {
 	Get(string) (*v1alpha.Project, error)
+	Create(id string, project *v1alpha.Project) (*v1alpha.Project, error)
 }

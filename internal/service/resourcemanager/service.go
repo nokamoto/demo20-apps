@@ -41,3 +41,27 @@ func (s *service) GetProject(ctx context.Context, req *v1alpha.GetProjectRequest
 
 	return res, nil
 }
+
+func (s *service) validateCreateProject(ctx context.Context, req *v1alpha.CreateProjectRequest) (string, []error) {
+	return req.GetProjectId(), validation.Concat(
+		validation.ID(req.GetProjectId()),
+		validation.Empty(req.GetProject().GetName()),
+	)
+}
+
+// CreateProject creates a project.
+func (s *service) CreateProject(ctx context.Context, req *v1alpha.CreateProjectRequest) (*v1alpha.Project, error) {
+	scoped := incall.NewInCall(s.logger, "CreateProject", req)
+
+	projectID, errs := s.validateCreateProject(ctx, req)
+	if len(errs) != 0 {
+		return nil, scoped.InvalidArgument(errs)
+	}
+
+	res, err := s.resourcemanager.Create(projectID, req.GetProject())
+	if err != nil {
+		return nil, scoped.Error(err)
+	}
+
+	return res, nil
+}
