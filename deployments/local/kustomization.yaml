@@ -2,5 +2,6 @@ resources:
 - compute.yaml
 - compute-automated-test.yaml
 - iam.yaml
+- iam-automated-test.yaml
 - rdb.yaml
 - resourcemanager.yaml

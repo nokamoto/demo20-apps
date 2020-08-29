@@ -42,6 +42,10 @@ func (i *InCall) Error(err error) error {
 		i.Logger.Debug("resource not found", zap.Error(err))
 		return status.Error(codes.NotFound, err.Error())
 	}
+	if errors.Is(err, application.ErrAlreadyExists) {
+		i.Logger.Debug("resource already exists", zap.Error(err))
+		return status.Error(codes.AlreadyExists, err.Error())
+	}
 
 	i.Logger.Error("unhandled error: unavailable", zap.Error(err))
 	return status.Error(codes.Unavailable, "unavailable")

@@ -23,6 +23,16 @@ spec:
           value: "1"
         - name: GRPC_SERVER_PORT
           value: "9001"
+        - name: MYSQL_USER
+          value: root
+        - name: MYSQL_PASSWORD
+          value: root
+        - name: MYSQL_HOST
+          value: mysql
+        - name: MYSQL_PORT
+          value: "3306"
+        - name: MYSQL_DATABASE
+          value: cloud
 ---
 apiVersion: v1
 kind: Service

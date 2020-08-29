@@ -1,0 +1,18 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: iam-automated-test
+spec:
+  template:
+    spec:
+      containers:
+      - image: iam-automated-test
+        name: iam-automated-test
+        env:
+        - name: LOGGER_DEBUG
+          value: "1"
+        - name: GRPC_ADDRESS
+          value: iam:9001
+      restartPolicy: Never
+  backoffLimit: 3

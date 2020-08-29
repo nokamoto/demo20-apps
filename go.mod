@@ -11,7 +11,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/kr/text v0.2.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
-	github.com/nokamoto/demo20-apis v0.0.0-20200824223616-e9175b81cba3
+	github.com/nokamoto/demo20-apis v0.0.0-20200829023530-267a2aa81f78
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
 	go.uber.org/zap v1.15.0

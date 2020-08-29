@@ -27,25 +27,13 @@ func (xs testCases) run(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			if x.mock == nil {
-				t.Fatal("no mock")
-			}
-
 			c := NewMockcompute(ctrl)
 			x.mock(c)
-
-			if x.run == nil {
-				t.Fatal("no run")
-			}
 
 			err := x.run(t, &service{
 				compute: c,
 				logger:  zaptest.NewLogger(t),
 			})
-
-			if x.check == nil {
-				t.Fatal("no check")
-			}
 
 			x.check(t, err)
 		})

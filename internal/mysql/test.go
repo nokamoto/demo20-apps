@@ -33,9 +33,7 @@ func (xs TestCases) Run(t *testing.T) {
 			}
 			defer db.Close()
 
-			if x.Mock != nil {
-				x.Mock(mock)
-			}
+			x.Mock(mock)
 
 			g, err := gorm.Open("mysql", db)
 			if err != nil {
@@ -43,17 +41,9 @@ func (xs TestCases) Run(t *testing.T) {
 			}
 			defer g.Close()
 
-			if x.Run == nil {
-				t.Fatal("no execution")
-			}
-
 			err = g.Transaction(func(tx *gorm.DB) error {
 				return x.Run(t, tx)
 			})
-
-			if x.Check == nil {
-				t.Fatal("no check")
-			}
 
 			x.Check(t, err)
 
