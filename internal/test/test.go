@@ -4,6 +4,9 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/jinzhu/gorm"
+
 	"google.golang.org/protobuf/testing/protocmp"
 
 	"google.golang.org/grpc/codes"
@@ -74,4 +77,27 @@ func Diff2(a1, a2 interface{}, err error) func(*testing.T, interface{}, interfac
 		}
 		return err
 	}
+}
+
+// UseGorm runs f with mocked sqls.
+func UseGorm(t *testing.T, f func(sqlmock.Sqlmock, *gorm.DB)) {
+	db, m, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+
+	g, err := gorm.Open("mysql", db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer g.Close()
+
+	f(m, g)
+}
+
+// Commit asserts that the transaction is comitted.
+func Commit(mock sqlmock.Sqlmock) {
+	mock.ExpectBegin()
+	mock.ExpectCommit()
 }

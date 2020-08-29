@@ -7,7 +7,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/jinzhu/gorm"
 	"github.com/nokamoto/demo20-apis/cloud/compute/v1alpha"
-	"github.com/nokamoto/demo20-apps/internal/compute/mock"
 	"github.com/nokamoto/demo20-apps/internal/mysql/compute"
 	"github.com/nokamoto/demo20-apps/internal/mysql/resourcemanager"
 	"github.com/nokamoto/demo20-apps/internal/test"
@@ -16,7 +15,7 @@ import (
 type testCase struct {
 	name  string
 	run   func(*testing.T, Compute) error
-	mock  func(*mock.MockinstanceQuery, *mock.MockprojectQuery)
+	mock  func(*MockinstanceQuery, *MockprojectQuery)
 	check test.Check
 	tx    func(sqlmock.Sqlmock)
 }
@@ -29,54 +28,23 @@ func (xs testCases) run(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			db, m, err := sqlmock.New()
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer db.Close()
+			test.UseGorm(t, func(m sqlmock.Sqlmock, g *gorm.DB) {
+				x.tx(m)
 
-			if x.tx == nil {
-				t.Fatal("no tx")
-			}
+				i := NewMockinstanceQuery(ctrl)
+				p := NewMockprojectQuery(ctrl)
+				x.mock(i, p)
 
-			x.tx(m)
+				err := x.run(t, Compute{
+					instanceQuery: i,
+					projectQuery:  p,
+					db:            g,
+				})
 
-			g, err := gorm.Open("mysql", db)
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer g.Close()
-
-			if x.mock == nil {
-				t.Fatal("no mock")
-			}
-
-			i := mock.NewMockinstanceQuery(ctrl)
-			p := mock.NewMockprojectQuery(ctrl)
-			x.mock(i, p)
-
-			if x.run == nil {
-				t.Fatal("no run")
-			}
-
-			err = x.run(t, Compute{
-				instanceQuery: i,
-				projectQuery:  p,
-				db:            g,
+				x.check(t, err)
 			})
-
-			if x.check == nil {
-				t.Fatal("no check")
-			}
-
-			x.check(t, err)
 		})
 	}
-}
-
-func commit(mock sqlmock.Sqlmock) {
-	mock.ExpectBegin()
-	mock.ExpectCommit()
 }
 
 func TestCompute_Create(t *testing.T) {
@@ -101,7 +69,7 @@ func TestCompute_Create(t *testing.T) {
 					Labels: []string{"baz", "qux"},
 				},
 			),
-			mock: func(i *mock.MockinstanceQuery, p *mock.MockprojectQuery) {
+			mock: func(i *MockinstanceQuery, p *MockprojectQuery) {
 				gomock.InOrder(
 					p.EXPECT().Get(gomock.Any(), "bar").Return(&resourcemanager.Project{
 						ProjectKey: 100,
@@ -114,7 +82,7 @@ func TestCompute_Create(t *testing.T) {
 				)
 			},
 			check: test.Succeeded,
-			tx:    commit,
+			tx:    test.Commit,
 		},
 	}
 

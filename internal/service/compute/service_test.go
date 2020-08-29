@@ -8,7 +8,6 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/golang/mock/gomock"
-	"github.com/nokamoto/demo20-apps/internal/service/compute/mock"
 	"github.com/nokamoto/demo20-apps/internal/test"
 	"go.uber.org/zap/zaptest"
 )
@@ -16,7 +15,7 @@ import (
 type testCase struct {
 	name  string
 	run   func(*testing.T, *service) error
-	mock  func(*mock.Mockcompute)
+	mock  func(*Mockcompute)
 	check test.Check
 }
 
@@ -32,7 +31,7 @@ func (xs testCases) run(t *testing.T) {
 				t.Fatal("no mock")
 			}
 
-			c := mock.NewMockcompute(ctrl)
+			c := NewMockcompute(ctrl)
 			x.mock(c)
 
 			if x.run == nil {
@@ -75,7 +74,7 @@ func Test_service_CreateInstance(t *testing.T) {
 					Labels: []string{"baz", "qux"},
 				},
 			),
-			mock: func(c *mock.Mockcompute) {
+			mock: func(c *Mockcompute) {
 				gomock.InOrder(
 					c.EXPECT().RandomName("todo").Return("todo-xyz"),
 					c.EXPECT().Create(
