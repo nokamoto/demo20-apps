@@ -16,6 +16,10 @@ build:
     docker:
       buildArgs:
         cmd: iam
+  - image: iam-automated-test
+    docker:
+      buildArgs:
+        cmd: iam-automated-test
   - image: rdb
     docker:
       buildArgs:

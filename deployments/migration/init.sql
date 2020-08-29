@@ -16,6 +16,11 @@ CREATE TABLE compute_instance (
     FOREIGN KEY (parent_key) REFERENCES resourcemanager_project (project_key)
 );
 
+CREATE TABLE iam_permission (
+    permission_key BIGINT PRIMARY KEY AUTO_INCREMENT,
+    permission_id VARCHAR(256)
+);
+
 INSERT INTO resourcemanager_project (
     project_id,
     display_name
