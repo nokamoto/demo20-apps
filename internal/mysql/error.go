@@ -1,4 +1,4 @@
-package core
+package mysql
 
 import (
 	"errors"
@@ -10,7 +10,12 @@ import (
 
 // https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html
 const (
-	DupEntry = 1062
+	dupEntry = 1062
+)
+
+var (
+	// TestDupEntryErr is a dup entry error for a test.
+	TestDupEntryErr = mysql.MySQLError{Number: dupEntry}
 )
 
 var (
@@ -27,7 +32,7 @@ func Translate(err error) error {
 	}
 	if e, ok := err.(*mysql.MySQLError); ok {
 		switch e.Number {
-		case DupEntry:
+		case dupEntry:
 			return ErrAlreadyExists
 		}
 	}

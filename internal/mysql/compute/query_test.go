@@ -7,9 +7,8 @@ import (
 	"github.com/nokamoto/demo20-apps/internal/test"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
-	"github.com/nokamoto/demo20-apps/internal/mysql/core"
+	"github.com/nokamoto/demo20-apps/internal/mysql"
 )
 
 func rows(xs ...Instance) *sqlmock.Rows {
@@ -23,7 +22,7 @@ func rows(xs ...Instance) *sqlmock.Rows {
 }
 
 func TestQuery_Create(t *testing.T) {
-	run := func(instance Instance) core.Run {
+	run := func(instance Instance) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return Query{}.Create(tx, &instance)
 		}
@@ -35,7 +34,7 @@ func TestQuery_Create(t *testing.T) {
 		Labels:     "bar,baz",
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run(instance),
@@ -55,10 +54,10 @@ func TestQuery_Create(t *testing.T) {
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `compute_instance` (`instance_id`,`parent_key`,`labels`) VALUES (?,?,?)")).
 					WithArgs(instance.InstanceID, instance.ParentKey, instance.Labels).
-					WillReturnError(&mysql.MySQLError{Number: core.DupEntry})
+					WillReturnError(&mysql.TestDupEntryErr)
 				mock.ExpectRollback()
 			},
-			Check: test.Failed(core.ErrAlreadyExists),
+			Check: test.Failed(mysql.ErrAlreadyExists),
 		},
 	}
 
@@ -66,13 +65,13 @@ func TestQuery_Create(t *testing.T) {
 }
 
 func TestQuery_Delete(t *testing.T) {
-	run := func(id string) core.Run {
+	run := func(id string) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return Query{}.Delete(tx, id)
 		}
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run("foo"),
@@ -91,7 +90,7 @@ func TestQuery_Delete(t *testing.T) {
 }
 
 func TestQuery_Get(t *testing.T) {
-	run := func(id string, expected *Instance) core.Run {
+	run := func(id string, expected *Instance) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return test.Diff1(Query{}.Get(tx, id))(t, expected)
 		}
@@ -104,7 +103,7 @@ func TestQuery_Get(t *testing.T) {
 		Labels:      "bar,baz",
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run("foo", &instance),
@@ -127,7 +126,7 @@ func TestQuery_Get(t *testing.T) {
 					WillReturnRows(rows())
 				mock.ExpectRollback()
 			},
-			Check: test.Failed(core.ErrNotFound),
+			Check: test.Failed(mysql.ErrNotFound),
 		},
 	}
 
@@ -137,7 +136,7 @@ func TestQuery_Get(t *testing.T) {
 func TestQuery_List(t *testing.T) {
 	offset, limit := 100, 200
 
-	run := func(parentKey int64, expected []*Instance) core.Run {
+	run := func(parentKey int64, expected []*Instance) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return test.Diff1(Query{}.List(tx, parentKey, offset, limit))(t, expected)
 		}
@@ -157,7 +156,7 @@ func TestQuery_List(t *testing.T) {
 		Labels:      "foo,baz",
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK empty",
 			Run:  run(3000, []*Instance{}),

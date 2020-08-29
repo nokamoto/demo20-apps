@@ -6,8 +6,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/nokamoto/demo20-apis/cloud/iam/v1alpha"
-	"github.com/nokamoto/demo20-apps/internal/core"
-	mysql "github.com/nokamoto/demo20-apps/internal/mysql/core"
+	"github.com/nokamoto/demo20-apps/internal/application"
+	"github.com/nokamoto/demo20-apps/internal/mysql"
 	"github.com/nokamoto/demo20-apps/internal/mysql/iam"
 )
 
@@ -32,7 +32,7 @@ func (i *Iam) Create(id string) (*v1alpha.Permission, error) {
 			PermissionID: id,
 		})
 		if errors.Is(err, mysql.ErrAlreadyExists) {
-			return fmt.Errorf("%s: %w", id, core.ErrAlreadyExists)
+			return fmt.Errorf("%s: %w", id, application.ErrAlreadyExists)
 		}
 		return err
 	})

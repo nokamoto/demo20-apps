@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
-	"github.com/nokamoto/demo20-apps/internal/core"
+	"github.com/nokamoto/demo20-apps/internal/application"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -36,9 +36,9 @@ func NewInCall(logger *zap.Logger, method string, req proto.Message) *InCall {
 	}
 }
 
-// Error converts from the internal/core error to a gRPC server error.
+// Error converts from the application error to a gRPC server error.
 func (i *InCall) Error(err error) error {
-	if errors.Is(err, core.ErrNotFound) {
+	if errors.Is(err, application.ErrNotFound) {
 		i.Logger.Debug("resource not found", zap.Error(err))
 		return status.Error(codes.NotFound, err.Error())
 	}

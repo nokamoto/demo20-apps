@@ -6,13 +6,12 @@ import (
 	"math/rand"
 	"strings"
 
-	"github.com/nokamoto/demo20-apps/internal/mysql/resourcemanager"
-
 	"github.com/jinzhu/gorm"
 	"github.com/nokamoto/demo20-apis/cloud/compute/v1alpha"
-	"github.com/nokamoto/demo20-apps/internal/core"
+	"github.com/nokamoto/demo20-apps/internal/application"
+	"github.com/nokamoto/demo20-apps/internal/mysql"
 	"github.com/nokamoto/demo20-apps/internal/mysql/compute"
-	mysql "github.com/nokamoto/demo20-apps/internal/mysql/core"
+	"github.com/nokamoto/demo20-apps/internal/mysql/resourcemanager"
 )
 
 // Compute defines a business logic for the cloud compute service.
@@ -48,7 +47,7 @@ func (c *Compute) Create(id, parentID string, instance *v1alpha.Instance) (*v1al
 	err := c.db.Transaction(func(tx *gorm.DB) error {
 		project, err := c.projectQuery.Get(tx, parentID)
 		if errors.Is(err, mysql.ErrNotFound) {
-			return fmt.Errorf("%s: %w", parentID, core.ErrNotFound)
+			return fmt.Errorf("%s: %w", parentID, application.ErrNotFound)
 		}
 		if err != nil {
 			return err

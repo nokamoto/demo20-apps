@@ -9,11 +9,11 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/go-cmp/cmp"
 	"github.com/jinzhu/gorm"
-	"github.com/nokamoto/demo20-apps/internal/mysql/core"
+	"github.com/nokamoto/demo20-apps/internal/mysql"
 )
 
 func TestQuery_Create(t *testing.T) {
-	run := func(cluster Cluster, instances ...int64) core.Run {
+	run := func(cluster Cluster, instances ...int64) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return Query{}.Create(tx, &cluster, instances)
 		}
@@ -25,7 +25,7 @@ func TestQuery_Create(t *testing.T) {
 		ParentKey: 20,
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run(cluster, 100),
@@ -47,7 +47,7 @@ func TestQuery_Create(t *testing.T) {
 }
 
 func TestQuery_Delete(t *testing.T) {
-	run := func(cluster Cluster) core.Run {
+	run := func(cluster Cluster) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return Query{}.Delete(tx, &cluster)
 		}
@@ -57,7 +57,7 @@ func TestQuery_Delete(t *testing.T) {
 		ClusterKey: 100,
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run(cluster),
@@ -99,7 +99,7 @@ func instanceRows(xs ...ClusterInstance) *sqlmock.Rows {
 }
 
 func TestQuery_Get(t *testing.T) {
-	run := func(id string, cexpected *Cluster, iexpected []*ClusterInstance) core.Run {
+	run := func(id string, cexpected *Cluster, iexpected []*ClusterInstance) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return test.Diff2(Query{}.Get(tx, id))(t, cexpected, iexpected)
 		}
@@ -115,7 +115,7 @@ func TestQuery_Get(t *testing.T) {
 		InstanceKey: 200,
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run(cluster.ClusterID, &cluster, []*ClusterInstance{&instance}),
@@ -139,7 +139,7 @@ func TestQuery_Get(t *testing.T) {
 func TestQuery_List(t *testing.T) {
 	offset, limit := 100, 200
 
-	run := func(parentKey int64, cexpected []*Cluster, iexpected []*ClusterInstance) core.Run {
+	run := func(parentKey int64, cexpected []*Cluster, iexpected []*ClusterInstance) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			cactual, iactual, err := Query{}.List(tx, parentKey, offset, limit)
 			if diff := cmp.Diff(cexpected, cactual); len(diff) != 0 {
@@ -163,7 +163,7 @@ func TestQuery_List(t *testing.T) {
 		InstanceKey: 200,
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run(cluster.ParentKey, []*Cluster{&cluster}, []*ClusterInstance{&instance}),

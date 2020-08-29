@@ -8,11 +8,11 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
-	"github.com/nokamoto/demo20-apps/internal/mysql/core"
+	"github.com/nokamoto/demo20-apps/internal/mysql"
 )
 
 func TestQuery_Create(t *testing.T) {
-	run := func(project Project) core.Run {
+	run := func(project Project) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return Query{}.Create(tx, &project)
 		}
@@ -23,7 +23,7 @@ func TestQuery_Create(t *testing.T) {
 		DisplayName: "foo display name",
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run(project),
@@ -42,13 +42,13 @@ func TestQuery_Create(t *testing.T) {
 }
 
 func TestQuery_Delete(t *testing.T) {
-	run := func(id string) core.Run {
+	run := func(id string) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return Query{}.Delete(tx, id)
 		}
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run("foo"),
@@ -67,7 +67,7 @@ func TestQuery_Delete(t *testing.T) {
 }
 
 func TestQuery_Update(t *testing.T) {
-	run := func(project Project) core.Run {
+	run := func(project Project) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return Query{}.Update(tx, &project)
 		}
@@ -79,7 +79,7 @@ func TestQuery_Update(t *testing.T) {
 		DisplayName: "foo display name",
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run(project),
@@ -108,7 +108,7 @@ func TestQuery_Get(t *testing.T) {
 		return v
 	}
 
-	run := func(id string, expected *Project) core.Run {
+	run := func(id string, expected *Project) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return test.Diff1(Query{}.Get(tx, id))(t, expected)
 		}
@@ -120,7 +120,7 @@ func TestQuery_Get(t *testing.T) {
 		DisplayName: "foo display name",
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run(project.ProjectID, &project),
