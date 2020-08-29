@@ -8,14 +8,13 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/nokamoto/demo20-apis/cloud/compute/v1alpha"
 	"github.com/nokamoto/demo20-apps/internal/mysql/compute"
-	"github.com/nokamoto/demo20-apps/internal/mysql/resourcemanager"
 	"github.com/nokamoto/demo20-apps/internal/test"
 )
 
 type testCase struct {
 	name  string
 	run   func(*testing.T, Compute) error
-	mock  func(*MockinstanceQuery, *MockprojectQuery)
+	mock  func(*MockinstanceQuery)
 	check test.Check
 	tx    func(sqlmock.Sqlmock)
 }
@@ -32,12 +31,10 @@ func (xs testCases) run(t *testing.T) {
 				x.tx(m)
 
 				i := NewMockinstanceQuery(ctrl)
-				p := NewMockprojectQuery(ctrl)
-				x.mock(i, p)
+				x.mock(i)
 
 				err := x.run(t, Compute{
 					instanceQuery: i,
-					projectQuery:  p,
 					db:            g,
 				})
 
@@ -69,17 +66,12 @@ func TestCompute_Create(t *testing.T) {
 					Labels: []string{"baz", "qux"},
 				},
 			),
-			mock: func(i *MockinstanceQuery, p *MockprojectQuery) {
-				gomock.InOrder(
-					p.EXPECT().Get(gomock.Any(), "bar").Return(&resourcemanager.Project{
-						ProjectKey: 100,
-					}, nil),
-					i.EXPECT().Create(gomock.Any(), &compute.Instance{
-						InstanceID: "foo",
-						ParentKey:  100,
-						Labels:     "baz,qux",
-					}).Return(nil),
-				)
+			mock: func(i *MockinstanceQuery) {
+				i.EXPECT().Create(gomock.Any(), &compute.Instance{
+					InstanceID: "foo",
+					ParentID:   "bar",
+					Labels:     "baz,qux",
+				}).Return(nil)
 			},
 			check: test.Succeeded,
 			tx:    test.Commit,

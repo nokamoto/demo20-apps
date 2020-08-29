@@ -13,10 +13,10 @@ import (
 
 func rows(xs ...Instance) *sqlmock.Rows {
 	v := sqlmock.NewRows([]string{
-		"instance_key", "instance_id", "parent_key", "labels",
+		"instance_key", "instance_id", "parent_id", "labels",
 	})
 	for _, x := range xs {
-		v.AddRow(x.InstanceKey, x.InstanceID, x.ParentKey, x.Labels)
+		v.AddRow(x.InstanceKey, x.InstanceID, x.ParentID, x.Labels)
 	}
 	return v
 }
@@ -30,7 +30,7 @@ func TestQuery_Create(t *testing.T) {
 
 	instance := Instance{
 		InstanceID: "foo",
-		ParentKey:  100,
+		ParentID:   "qux",
 		Labels:     "bar,baz",
 	}
 
@@ -40,8 +40,8 @@ func TestQuery_Create(t *testing.T) {
 			Run:  run(instance),
 			Mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `compute_instance` (`instance_id`,`parent_key`,`labels`) VALUES (?,?,?)")).
-					WithArgs(instance.InstanceID, instance.ParentKey, instance.Labels).
+				mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `compute_instance` (`instance_id`,`parent_id`,`labels`) VALUES (?,?,?)")).
+					WithArgs(instance.InstanceID, instance.ParentID, instance.Labels).
 					WillReturnResult(sqlmock.NewResult(1000, 1))
 				mock.ExpectCommit()
 			},
@@ -52,8 +52,8 @@ func TestQuery_Create(t *testing.T) {
 			Run:  run(instance),
 			Mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `compute_instance` (`instance_id`,`parent_key`,`labels`) VALUES (?,?,?)")).
-					WithArgs(instance.InstanceID, instance.ParentKey, instance.Labels).
+				mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `compute_instance` (`instance_id`,`parent_id`,`labels`) VALUES (?,?,?)")).
+					WithArgs(instance.InstanceID, instance.ParentID, instance.Labels).
 					WillReturnError(&mysql.TestDupEntryErr)
 				mock.ExpectRollback()
 			},
@@ -99,7 +99,7 @@ func TestQuery_Get(t *testing.T) {
 	instance := Instance{
 		InstanceKey: 1000,
 		InstanceID:  "foo",
-		ParentKey:   100,
+		ParentID:    "qux",
 		Labels:      "bar,baz",
 	}
 
@@ -136,34 +136,34 @@ func TestQuery_Get(t *testing.T) {
 func TestQuery_List(t *testing.T) {
 	offset, limit := 100, 200
 
-	run := func(parentKey int64, expected []*Instance) mysql.Run {
+	run := func(parentID string, expected []*Instance) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			return test.Diff1(Query{}.List(tx, parentKey, offset, limit))(t, expected)
+			return test.Diff1(Query{}.List(tx, parentID, offset, limit))(t, expected)
 		}
 	}
 
 	foo := Instance{
 		InstanceKey: 1000,
 		InstanceID:  "foo",
-		ParentKey:   100,
+		ParentID:    "qux",
 		Labels:      "bar,baz",
 	}
 
 	bar := Instance{
 		InstanceKey: 2000,
 		InstanceID:  "bar",
-		ParentKey:   200,
+		ParentID:    "qux",
 		Labels:      "foo,baz",
 	}
 
 	xs := mysql.TestCases{
 		{
 			Name: "OK empty",
-			Run:  run(3000, []*Instance{}),
+			Run:  run("qux", []*Instance{}),
 			Mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `compute_instance`  WHERE (parent_key = ?) LIMIT 200 OFFSET 100")).
-					WithArgs(3000).
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `compute_instance`  WHERE (parent_id = ?) LIMIT 200 OFFSET 100")).
+					WithArgs("qux").
 					WillReturnRows(rows())
 				mock.ExpectCommit()
 			},
@@ -171,11 +171,11 @@ func TestQuery_List(t *testing.T) {
 		},
 		{
 			Name: "OK",
-			Run:  run(3000, []*Instance{&foo, &bar}),
+			Run:  run("qux", []*Instance{&foo, &bar}),
 			Mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `compute_instance`  WHERE (parent_key = ?) LIMIT 200 OFFSET 100")).
-					WithArgs(3000).
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `compute_instance`  WHERE (parent_id = ?) LIMIT 200 OFFSET 100")).
+					WithArgs("qux").
 					WillReturnRows(rows(foo, bar))
 				mock.ExpectCommit()
 			},

@@ -4,16 +4,16 @@ USE cloud;
 
 CREATE TABLE resourcemanager_project (
     project_key BIGINT PRIMARY KEY AUTO_INCREMENT,
-    project_id VARCHAR(256),
+    project_id VARCHAR(256) UNIQUE,
     display_name VARCHAR(256)
 );
 
 CREATE TABLE compute_instance (
     instance_key BIGINT PRIMARY KEY AUTO_INCREMENT,
     instance_id VARCHAR(256),
-    parent_key BIGINT,
+    parent_id VARCHAR(256),
     labels VARCHAR(256),
-    FOREIGN KEY (parent_key) REFERENCES resourcemanager_project (project_key)
+    FOREIGN KEY (parent_id) REFERENCES resourcemanager_project (project_id)
 );
 
 CREATE TABLE iam_permission (

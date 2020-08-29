@@ -8,19 +8,19 @@ import (
 // Query defines queries for rdb tables within a transaction.
 type Query struct{}
 
-func newBulkClusterInstance(clusterKey int64, instanceKeys []int64) bulkClusterInstance {
+func newBulkClusterInstance(clusterKey int64, instanceIDs []string) bulkClusterInstance {
 	var instances bulkClusterInstance
-	for _, i := range instanceKeys {
+	for _, i := range instanceIDs {
 		instances = append(instances, &ClusterInstance{
-			ClusterKey:  clusterKey,
-			InstanceKey: i,
+			ClusterKey: clusterKey,
+			InstanceID: i,
 		})
 	}
 	return instances
 }
 
 // Create inserts cluster and instance records.
-func (q Query) Create(tx *gorm.DB, cluster *Cluster, instanceKeys []int64) error {
+func (q Query) Create(tx *gorm.DB, cluster *Cluster, instanceIDs []string) error {
 	res := tx.Debug().Create(cluster)
 	if res.Error != nil {
 		return mysql.Translate(res.Error)
@@ -29,7 +29,7 @@ func (q Query) Create(tx *gorm.DB, cluster *Cluster, instanceKeys []int64) error
 	return mysql.BulkInsert(
 		tx,
 		ClusterInstance{}.TableName(),
-		newBulkClusterInstance(cluster.ClusterKey, instanceKeys),
+		newBulkClusterInstance(cluster.ClusterKey, instanceIDs),
 	)
 }
 
@@ -65,10 +65,10 @@ func (Query) Get(tx *gorm.DB, id string) (*Cluster, []*ClusterInstance, error) {
 	return &cluster, instances, nil
 }
 
-// List returns cluster and instance records by the parent key.
-func (Query) List(tx *gorm.DB, parentKey int64, offset, limit int) ([]*Cluster, []*ClusterInstance, error) {
+// List returns cluster and instance records by the parent id.
+func (Query) List(tx *gorm.DB, parentID string, offset, limit int) ([]*Cluster, []*ClusterInstance, error) {
 	var clusters []*Cluster
-	err := mysql.List(tx, &clusters, offset, limit, "parent_key = ?", parentKey)
+	err := mysql.List(tx, &clusters, offset, limit, "parent_id = ?", parentID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -87,7 +87,7 @@ func (Query) List(tx *gorm.DB, parentKey int64, offset, limit int) ([]*Cluster, 
 }
 
 // Update updates cluster and instance records.
-func (Query) Update(tx *gorm.DB, cluster *Cluster, instanceKeys []int64) error {
+func (Query) Update(tx *gorm.DB, cluster *Cluster, instanceIDs []string) error {
 	res := tx.Debug().Save(cluster)
 	if res.Error != nil {
 		return mysql.Translate(res.Error)
@@ -101,6 +101,6 @@ func (Query) Update(tx *gorm.DB, cluster *Cluster, instanceKeys []int64) error {
 	return mysql.BulkInsert(
 		tx,
 		ClusterInstance{}.TableName(),
-		newBulkClusterInstance(cluster.ClusterKey, instanceKeys),
+		newBulkClusterInstance(cluster.ClusterKey, instanceIDs),
 	)
 }

@@ -2,7 +2,9 @@ package automatedtest
 
 import (
 	"log"
+	"math/rand"
 	"os"
+	"time"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -19,6 +21,8 @@ const (
 //   "LOGGER_DEBUG" - prints debug level logs if set a non empty string.
 //   "GRPC_ADDRESS" - connects to the gRPC server address.
 func Main(f func(*grpc.ClientConn) Scenarios) {
+	rand.Seed(time.Now().Unix())
+
 	cfg := zap.NewProductionConfig()
 	if len(os.Getenv(loggerDebug)) != 0 {
 		cfg.Level.SetLevel(zap.DebugLevel)

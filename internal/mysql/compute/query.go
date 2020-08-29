@@ -25,7 +25,7 @@ func (Query) Get(tx *gorm.DB, id string) (*Instance, error) {
 }
 
 // List returns instance records by the parent id.
-func (Query) List(tx *gorm.DB, parentKey int64, offset int, limit int) ([]*Instance, error) {
+func (Query) List(tx *gorm.DB, parentID string, offset int, limit int) ([]*Instance, error) {
 	var instances []*Instance
-	return instances, mysql.List(tx, &instances, offset, limit, "parent_key = ?", parentKey)
+	return instances, mysql.List(tx, &instances, offset, limit, "parent_id = ?", parentID)
 }

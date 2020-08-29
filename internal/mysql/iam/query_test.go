@@ -94,7 +94,7 @@ func TestRoleQuery_Create(t *testing.T) {
 
 	role := Role{
 		RoleID:      "foo",
-		ParentKey:   100,
+		ParentID:    "baz",
 		DisplayName: "foo display name",
 	}
 
@@ -109,8 +109,8 @@ func TestRoleQuery_Create(t *testing.T) {
 			Run:  run(role, &permission),
 			Mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `iam_role` (`role_id`,`parent_key`,`display_name`) VALUES (?,?,?)")).
-					WithArgs(role.RoleID, role.ParentKey, role.DisplayName).
+				mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `iam_role` (`role_id`,`parent_id`,`display_name`) VALUES (?,?,?)")).
+					WithArgs(role.RoleID, role.ParentID, role.DisplayName).
 					WillReturnResult(sqlmock.NewResult(1000, 1))
 				mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `iam_role_permission` (`role_key`,`permission_key`) VALUES (?,?)")).
 					WithArgs(1000, permission.PermissionKey).
@@ -158,10 +158,10 @@ func TestRoleQuery_Delete(t *testing.T) {
 
 func roleRows(roles ...Role) *sqlmock.Rows {
 	v := sqlmock.NewRows([]string{
-		"role_key", "role_id", "parent_key", "display_name",
+		"role_key", "role_id", "parent_id", "display_name",
 	})
 	for _, x := range roles {
-		v.AddRow(x.RoleKey, x.RoleID, x.ParentKey, x.DisplayName)
+		v.AddRow(x.RoleKey, x.RoleID, x.ParentID, x.DisplayName)
 	}
 	return v
 }
@@ -223,7 +223,7 @@ func TestRoleQuery_Update(t *testing.T) {
 	role := Role{
 		RoleKey:     100,
 		RoleID:      "foo",
-		ParentKey:   200,
+		ParentID:    "bar",
 		DisplayName: "foo display name",
 	}
 
@@ -237,8 +237,8 @@ func TestRoleQuery_Update(t *testing.T) {
 			Run:  run(&role, &permission),
 			Mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(regexp.QuoteMeta("UPDATE `iam_role` SET `role_id` = ?, `parent_key` = ?, `display_name` = ? WHERE `iam_role`.`role_key` = ?")).
-					WithArgs(role.RoleID, role.ParentKey, role.DisplayName, role.RoleKey).
+				mock.ExpectExec(regexp.QuoteMeta("UPDATE `iam_role` SET `role_id` = ?, `parent_id` = ?, `display_name` = ? WHERE `iam_role`.`role_key` = ?")).
+					WithArgs(role.RoleID, role.ParentID, role.DisplayName, role.RoleKey).
 					WillReturnResult(sqlmock.NewResult(1000, 1))
 				mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `iam_role_permission` WHERE (role_key = ?)")).
 					WithArgs(role.RoleKey).
@@ -258,9 +258,9 @@ func TestRoleQuery_Update(t *testing.T) {
 func TestRoleQuery_List(t *testing.T) {
 	offset, limit := 100, 200
 
-	run := func(parentKey int64, rexpected []*Role, pexpected []*RolePermission) mysql.Run {
+	run := func(parentID string, rexpected []*Role, pexpected []*RolePermission) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
-			return test.Diff2(RoleQuery{}.List(tx, parentKey, offset, limit))(t, rexpected, pexpected)
+			return test.Diff2(RoleQuery{}.List(tx, parentID, offset, limit))(t, rexpected, pexpected)
 		}
 	}
 
@@ -276,11 +276,11 @@ func TestRoleQuery_List(t *testing.T) {
 	xs := mysql.TestCases{
 		{
 			Name: "OK",
-			Run:  run(500, []*Role{&role}, []*RolePermission{&permission}),
+			Run:  run("foo", []*Role{&role}, []*RolePermission{&permission}),
 			Mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `iam_role` WHERE (parent_key = ?) LIMIT 200 OFFSET 100")).
-					WithArgs(500).
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `iam_role` WHERE (parent_id = ?) LIMIT 200 OFFSET 100")).
+					WithArgs("foo").
 					WillReturnRows(roleRows(role))
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `iam_role_permission` WHERE (role_key in (?))")).
 					WithArgs(role.RoleKey).
