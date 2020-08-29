@@ -15,7 +15,7 @@ func (Permission) TableName() string {
 type Role struct {
 	RoleKey     int64  `gorm:"column:role_key;auto_increment;primary_key"`
 	RoleID      string `gorm:"column:role_id"`
-	ParentKey   int64  `gorm:"column:parent_key"`
+	ParentID    string `gorm:"column:parent_id"`
 	DisplayName string `gorm:"column:display_name"`
 }
 

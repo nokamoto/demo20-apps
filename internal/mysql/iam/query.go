@@ -111,9 +111,9 @@ func (q RoleQuery) Update(tx *gorm.DB, role *Role, permissions ...*Permission) e
 }
 
 // List returns role and role-permission records by the parent key.
-func (RoleQuery) List(tx *gorm.DB, parentKey int64, offset, limit int) ([]*Role, []*RolePermission, error) {
+func (RoleQuery) List(tx *gorm.DB, parentID string, offset, limit int) ([]*Role, []*RolePermission, error) {
 	var roles []*Role
-	err := mysql.List(tx, &roles, offset, limit, "parent_key = ?", parentKey)
+	err := mysql.List(tx, &roles, offset, limit, "parent_id = ?", parentID)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -4,7 +4,7 @@ package compute
 type Instance struct {
 	InstanceKey int64  `gorm:"column:instance_key;auto_increment;primary_key"`
 	InstanceID  string `gorm:"column:instance_id"`
-	ParentKey   int64  `gorm:"column:parent_key"`
+	ParentID    string `gorm:"column:parent_id"`
 	Labels      string `gorm:"column:labels"`
 }
 
