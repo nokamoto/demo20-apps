@@ -1,0 +1,18 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rdb-automated-test
+spec:
+  template:
+    spec:
+      containers:
+      - image: rdb-automated-test
+        name: rdb-automated-test
+        env:
+        - name: LOGGER_DEBUG
+          value: "1"
+        - name: GRPC_ADDRESS
+          value: rdb:9002
+      restartPolicy: Never
+  backoffLimit: 3

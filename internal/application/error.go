@@ -12,6 +12,8 @@ var (
 	ErrNotFound = errors.New("not found")
 	// ErrAlreadyExists represents a resource already exists.
 	ErrAlreadyExists = errors.New("already exists")
+	// ErrInternal represents an unexpected condition. It recommends to print the error message if caught.
+	ErrInternal = errors.New("internal")
 )
 
 // ErrorCode is an internal error number for ErrorMap.
@@ -25,6 +27,8 @@ const (
 	NotFound ErrorCode = iota
 	// AlreadyExists is ErrorCode corresponing to ErrAlreadyExists.
 	AlreadyExists
+	// Internal is ErrorCode corresponding to ErrInternal.
+	Internal
 )
 
 // Error converts the mysql error to an application error using the error map.

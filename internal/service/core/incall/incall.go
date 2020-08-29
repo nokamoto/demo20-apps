@@ -46,6 +46,10 @@ func (i *InCall) Error(err error) error {
 		i.Logger.Debug("resource already exists", zap.Error(err))
 		return status.Error(codes.AlreadyExists, err.Error())
 	}
+	if errors.Is(err, application.ErrInternal) {
+		i.Logger.Error("internal", zap.Error(err))
+		return status.Error(codes.Internal, "internal")
+	}
 
 	i.Logger.Error("unhandled error: unavailable", zap.Error(err))
 	return status.Error(codes.Unavailable, "unavailable")

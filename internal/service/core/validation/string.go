@@ -13,7 +13,7 @@ func Empty(s string) error {
 	return nil
 }
 
-// ID returns an erros if s is not an id string.
+// ID returns an error if s is not an id string.
 func ID(s string) error {
 	exp := "^[a-z0-9]{1,16}$"
 	if !regexp.MustCompile(exp).MatchString(s) {
@@ -31,4 +31,12 @@ func Concat(errs ...error) []error {
 		}
 	}
 	return xs
+}
+
+// EmptyStrings returns an error if the slice is not empty.
+func EmptyStrings(xs []string) error {
+	if len(xs) != 0 {
+		return fmt.Errorf("expected empty but actual %v", xs)
+	}
+	return nil
 }
