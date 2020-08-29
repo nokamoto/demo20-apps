@@ -24,6 +24,10 @@ build:
     docker:
       buildArgs:
         cmd: rdb
+  - image: rdb-automated-test
+    docker:
+      buildArgs:
+        cmd: rdb-automated-test
   - image: resourcemanager
     docker:
       buildArgs:
