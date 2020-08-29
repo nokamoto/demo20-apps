@@ -4,19 +4,11 @@ import (
 	"fmt"
 	"os"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )
 
-const (
-	mysqlUser     = "MYSQL_USER"
-	mysqlPassword = "MYSQL_PASSWORD"
-	mysqlHost     = "MYSQL_HOST"
-	mysqlPort     = "MYSQL_PORT"
-	mysqlDatabase = "MYSQL_DATABASE"
-)
-
-// MySQL returns a database connection.
-func MySQL() (*gorm.DB, error) {
+func mySQL() (*gorm.DB, error) {
 	uri := fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s",
 		os.Getenv(mysqlUser),

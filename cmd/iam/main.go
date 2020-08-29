@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/jinzhu/gorm"
 	admin "github.com/nokamoto/demo20-apis/cloud/iam/admin/v1alpha"
 	iam "github.com/nokamoto/demo20-apis/cloud/iam/v1alpha"
 	application "github.com/nokamoto/demo20-apps/internal/application/iam"
@@ -11,12 +12,7 @@ import (
 )
 
 func main() {
-	server.Main(func(logger *zap.Logger, s *grpc.Server) error {
-		db, err := server.MySQL()
-		if err != nil {
-			return err
-		}
-
+	server.Main(func(logger *zap.Logger, s *grpc.Server, db *gorm.DB) error {
 		admin.RegisterIamServer(s, service.NewAdminService(
 			application.NewIam(db),
 			logger,
