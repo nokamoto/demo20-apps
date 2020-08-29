@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/nokamoto/demo20-apis/cloud/compute/v1alpha"
 	"github.com/nokamoto/demo20-apps/internal/automatedtest"
 	"go.uber.org/zap"
@@ -34,20 +33,12 @@ func main() {
 						return nil, fmt.Errorf("unexpected prefix: %v", res)
 					}
 
-					logger.Debug("ignore fields", zap.String("name", res.GetName()))
-					res.Name = ""
-
 					expected := &v1alpha.Instance{
 						Parent: "projects/todo",
 						Labels: []string{"foo", "bar"},
 					}
 
-					if diff := cmp.Diff(expected, res, protocmp.Transform()); len(diff) != 0 {
-						fmt.Println(diff)
-						return nil, fmt.Errorf("unexpected response: %s", diff)
-					}
-
-					return state, nil
+					return state, automatedtest.Diff(expected, res, protocmp.IgnoreFields(&v1alpha.Instance{}, "name"))
 				},
 			},
 		}

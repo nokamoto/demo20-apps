@@ -28,6 +28,10 @@ build:
     docker:
       buildArgs:
         cmd: resourcemanager
+  - image: resourcemanager-automated-test
+    docker:
+      buildArgs:
+        cmd: resourcemanager-automated-test
 deploy:
   kustomize:
     paths:

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/nokamoto/demo20-apis/cloud/compute/v1alpha"
 	"github.com/nokamoto/demo20-apps/internal/application/compute"
 	"github.com/nokamoto/demo20-apps/internal/server"
@@ -10,15 +11,8 @@ import (
 )
 
 func main() {
-	server.Main(func(logger *zap.Logger, s *grpc.Server) error {
-		db, err := server.MySQL()
-		if err != nil {
-			return err
-		}
-
-		compute := compute.NewCompute(db)
-		v1alpha.RegisterComputeServer(s, service.NewService(compute, logger))
-
+	server.Main(func(logger *zap.Logger, s *grpc.Server, db *gorm.DB) error {
+		v1alpha.RegisterComputeServer(s, service.NewService(compute.NewCompute(db), logger))
 		return nil
 	})
 }

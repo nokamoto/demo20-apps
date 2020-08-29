@@ -5,3 +5,4 @@ resources:
 - iam-automated-test.yaml
 - rdb.yaml
 - resourcemanager.yaml
+- resourcemanager-automated-test.yaml
