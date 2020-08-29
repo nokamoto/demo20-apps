@@ -8,11 +8,11 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
-	"github.com/nokamoto/demo20-apps/internal/mysql/core"
+	"github.com/nokamoto/demo20-apps/internal/mysql"
 )
 
 func TestPermissionQuery_Create(t *testing.T) {
-	run := func(permission Permission) core.Run {
+	run := func(permission Permission) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return PermissionQuery{}.Create(tx, &permission)
 		}
@@ -22,7 +22,7 @@ func TestPermissionQuery_Create(t *testing.T) {
 		PermissionID: "foo",
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run(permission),
@@ -51,7 +51,7 @@ func TestPermissionQuery_List(t *testing.T) {
 		return v
 	}
 
-	run := func(permissionIDs []string, expected []*Permission) core.Run {
+	run := func(permissionIDs []string, expected []*Permission) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return test.Diff1(PermissionQuery{}.List(tx, permissionIDs...))(t, expected)
 		}
@@ -67,7 +67,7 @@ func TestPermissionQuery_List(t *testing.T) {
 		PermissionID:  "bar",
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run([]string{"foo", "bar"}, []*Permission{&foo, &bar}),
@@ -86,7 +86,7 @@ func TestPermissionQuery_List(t *testing.T) {
 }
 
 func TestRoleQuery_Create(t *testing.T) {
-	run := func(role Role, permissions ...*Permission) core.Run {
+	run := func(role Role, permissions ...*Permission) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return RoleQuery{}.Create(tx, &role, permissions...)
 		}
@@ -103,7 +103,7 @@ func TestRoleQuery_Create(t *testing.T) {
 		PermissionID:  "bar",
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run(role, &permission),
@@ -125,7 +125,7 @@ func TestRoleQuery_Create(t *testing.T) {
 }
 
 func TestRoleQuery_Delete(t *testing.T) {
-	run := func(role Role) core.Run {
+	run := func(role Role) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return RoleQuery{}.Delete(tx, &role)
 		}
@@ -135,7 +135,7 @@ func TestRoleQuery_Delete(t *testing.T) {
 		RoleKey: 100,
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run(role),
@@ -177,7 +177,7 @@ func rolePermissionRows(permissions ...RolePermission) *sqlmock.Rows {
 }
 
 func TestRoleQuery_Get(t *testing.T) {
-	run := func(id string, rexpected *Role, pexpected ...*RolePermission) core.Run {
+	run := func(id string, rexpected *Role, pexpected ...*RolePermission) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return test.Diff2(RoleQuery{}.Get(tx, id))(t, rexpected, pexpected)
 		}
@@ -192,7 +192,7 @@ func TestRoleQuery_Get(t *testing.T) {
 		PermissionKey: 200,
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run("foo", &role, &permission),
@@ -214,7 +214,7 @@ func TestRoleQuery_Get(t *testing.T) {
 }
 
 func TestRoleQuery_Update(t *testing.T) {
-	run := func(role *Role, permissions ...*Permission) core.Run {
+	run := func(role *Role, permissions ...*Permission) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return RoleQuery{}.Update(tx, role, permissions...)
 		}
@@ -231,7 +231,7 @@ func TestRoleQuery_Update(t *testing.T) {
 		PermissionKey: 200,
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run(&role, &permission),
@@ -258,7 +258,7 @@ func TestRoleQuery_Update(t *testing.T) {
 func TestRoleQuery_List(t *testing.T) {
 	offset, limit := 100, 200
 
-	run := func(parentKey int64, rexpected []*Role, pexpected []*RolePermission) core.Run {
+	run := func(parentKey int64, rexpected []*Role, pexpected []*RolePermission) mysql.Run {
 		return func(t *testing.T, tx *gorm.DB) error {
 			return test.Diff2(RoleQuery{}.List(tx, parentKey, offset, limit))(t, rexpected, pexpected)
 		}
@@ -273,7 +273,7 @@ func TestRoleQuery_List(t *testing.T) {
 		PermissionKey: 400,
 	}
 
-	xs := core.TestCases{
+	xs := mysql.TestCases{
 		{
 			Name: "OK",
 			Run:  run(500, []*Role{&role}, []*RolePermission{&permission}),

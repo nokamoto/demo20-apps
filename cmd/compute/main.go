@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/nokamoto/demo20-apis/cloud/compute/v1alpha"
-	"github.com/nokamoto/demo20-apps/internal/compute"
+	"github.com/nokamoto/demo20-apps/internal/application/compute"
 	"github.com/nokamoto/demo20-apps/internal/server"
 	service "github.com/nokamoto/demo20-apps/internal/service/compute"
 	"go.uber.org/zap"
