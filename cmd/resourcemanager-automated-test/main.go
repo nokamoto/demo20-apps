@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/golang/protobuf/proto"
-	"fmt"
 	"context"
+	"fmt"
+
+	"github.com/golang/protobuf/proto"
 
 	"github.com/nokamoto/demo20-apis/cloud/resourcemanager/v1alpha"
 	"github.com/nokamoto/demo20-apps/internal/automatedtest"
