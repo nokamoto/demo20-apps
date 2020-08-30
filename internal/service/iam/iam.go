@@ -7,4 +7,5 @@ import (
 
 type iam interface {
 	Create(string) (*v1alpha.Permission, error)
+	CreateMachineUser(string, *v1alpha.MachineUser) (*v1alpha.MachineUser, error)
 }

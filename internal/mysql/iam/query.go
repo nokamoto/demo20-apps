@@ -154,3 +154,11 @@ func (RoleBindingQuery) List(tx *gorm.DB, parentKey int64, offset, limit int) ([
 	var roleBindings []*RoleBinding
 	return roleBindings, mysql.List(tx, &roleBindings, offset, limit, "parent_key = ?", parentKey)
 }
+
+// MachineUserQuery defines queries for a machine user table within a transaction.
+type MachineUserQuery struct{}
+
+// Create inserts the machine user record.
+func (MachineUserQuery) Create(tx *gorm.DB, machineUser *MachineUser) error {
+	return mysql.Create(tx, machineUser)
+}

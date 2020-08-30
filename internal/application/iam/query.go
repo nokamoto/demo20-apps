@@ -9,3 +9,7 @@ import (
 type permissionQuery interface {
 	Create(*gorm.DB, *iam.Permission) error
 }
+
+type machineUserQuery interface {
+	Create(*gorm.DB, *iam.MachineUser) error
+}

@@ -21,6 +21,14 @@ CREATE TABLE iam_permission (
     permission_id VARCHAR(256) UNIQUE
 );
 
+CREATE TABLE iam_machine_user (
+    machine_user_key BIGINT PRIMARY KEY AUTO_INCREMENT,
+    machine_user_id VARCHAR(256) UNIQUE,
+    display_name VARCHAR(256),
+    parent_id VARCHAR(256),
+    FOREIGN KEY (parent_id) REFERENCES resourcemanager_project (project_id)
+);
+
 CREATE TABLE rdb_cluster (
     cluster_key BIGINT PRIMARY KEY AUTO_INCREMENT,
     cluster_id VARCHAR(256) UNIQUE,
@@ -40,4 +48,5 @@ INSERT INTO resourcemanager_project (
     project_id,
     display_name
 ) VALUES
+    ('/', 'root'),
     ('todo', 'todo display name');

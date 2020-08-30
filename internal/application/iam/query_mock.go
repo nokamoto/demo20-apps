@@ -47,3 +47,40 @@ func (mr *MockpermissionQueryMockRecorder) Create(arg0, arg1 interface{}) *gomoc
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockpermissionQuery)(nil).Create), arg0, arg1)
 }
+
+// MockmachineUserQuery is a mock of machineUserQuery interface
+type MockmachineUserQuery struct {
+	ctrl     *gomock.Controller
+	recorder *MockmachineUserQueryMockRecorder
+}
+
+// MockmachineUserQueryMockRecorder is the mock recorder for MockmachineUserQuery
+type MockmachineUserQueryMockRecorder struct {
+	mock *MockmachineUserQuery
+}
+
+// NewMockmachineUserQuery creates a new mock instance
+func NewMockmachineUserQuery(ctrl *gomock.Controller) *MockmachineUserQuery {
+	mock := &MockmachineUserQuery{ctrl: ctrl}
+	mock.recorder = &MockmachineUserQueryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockmachineUserQuery) EXPECT() *MockmachineUserQueryMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method
+func (m *MockmachineUserQuery) Create(arg0 *gorm.DB, arg1 *iam.MachineUser) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Create indicates an expected call of Create
+func (mr *MockmachineUserQueryMockRecorder) Create(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockmachineUserQuery)(nil).Create), arg0, arg1)
+}

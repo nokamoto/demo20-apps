@@ -43,6 +43,29 @@ func main() {
 					return state, nil
 				},
 			},
+			{
+				Name: "create a machine user",
+				Run: func(state automatedtest.State, logger *zap.Logger) (automatedtest.State, error) {
+					res, err := c.CreateMachineUser(context.Background(), &admin.CreateMachineUserRequest{
+						MachineUser: &v1alpha.MachineUser{
+							DisplayName: "test machine user",
+						},
+					})
+					if err != nil {
+						return nil, err
+					}
+
+					expected := &v1alpha.MachineUser{
+						DisplayName: "test machine user",
+					}
+
+					if diff := cmp.Diff(expected, res, protocmp.Transform(), protocmp.IgnoreFields(&v1alpha.MachineUser{}, "name", "api_key")); len(diff) != 0 {
+						return nil, fmt.Errorf("unexpected response: %s", diff)
+					}
+
+					return state, nil
+				},
+			},
 		}
 	})
 }
