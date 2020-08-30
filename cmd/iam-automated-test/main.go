@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/golang/protobuf/proto"
+
 	"google.golang.org/protobuf/testing/protocmp"
 
 	"github.com/google/go-cmp/cmp"
@@ -40,6 +42,8 @@ func main() {
 						return nil, fmt.Errorf("unexpected response: %s", diff)
 					}
 
+					state["permission"] = proto.MarshalTextString(res)
+
 					return state, nil
 				},
 			},
@@ -57,9 +61,129 @@ func main() {
 
 					expected := &v1alpha.MachineUser{
 						DisplayName: "test machine user",
+						Parent:      "projects//",
 					}
 
 					if diff := cmp.Diff(expected, res, protocmp.Transform(), protocmp.IgnoreFields(&v1alpha.MachineUser{}, "name", "api_key")); len(diff) != 0 {
+						return nil, fmt.Errorf("unexpected response: %s", diff)
+					}
+
+					state["machineuser"] = proto.MarshalTextString(res)
+
+					return state, nil
+				},
+			},
+			{
+				Name: "create a role",
+				Run: func(state automatedtest.State, logger *zap.Logger) (automatedtest.State, error) {
+					id := automatedtest.RandomID()
+
+					var permission v1alpha.Permission
+					err := proto.UnmarshalText(state["permission"], &permission)
+					if err != nil {
+						return nil, err
+					}
+
+					res, err := c.CreateRole(context.Background(), &admin.CreateRoleRequest{
+						RoleId: id,
+						Role: &v1alpha.Role{
+							DisplayName: "test display name",
+							Permissions: []string{permission.GetName()},
+						},
+					})
+					if err != nil {
+						return nil, err
+					}
+
+					expected := &v1alpha.Role{
+						Name:        fmt.Sprintf("roles/%s", id),
+						DisplayName: "test display name",
+						Permissions: []string{permission.GetName()},
+						Parent:      "projects//",
+					}
+
+					if diff := cmp.Diff(expected, res, protocmp.Transform()); len(diff) != 0 {
+						return nil, fmt.Errorf("unexpected response: %s", diff)
+					}
+
+					state["role"] = proto.MarshalTextString(res)
+
+					return state, nil
+				},
+			},
+			{
+				Name: "add a role binding",
+				Run: func(state automatedtest.State, logger *zap.Logger) (automatedtest.State, error) {
+					var role v1alpha.Role
+					err := proto.UnmarshalText(state["role"], &role)
+					if err != nil {
+						return nil, err
+					}
+
+					var machineUser v1alpha.MachineUser
+					err = proto.UnmarshalText(state["machineuser"], &machineUser)
+					if err != nil {
+						return nil, err
+					}
+
+					res, err := c.AddRoleBinding(context.Background(), &admin.AddRoleBindingRequest{
+						RoleBinding: &v1alpha.RoleBinding{
+							Role: role.GetName(),
+							User: machineUser.GetName(),
+						},
+					})
+					if err != nil {
+						return nil, err
+					}
+
+					expected := &v1alpha.RoleBinding{
+						Role:   role.GetName(),
+						User:   machineUser.GetName(),
+						Parent: "projects//",
+					}
+
+					if diff := cmp.Diff(expected, res, protocmp.Transform()); len(diff) != 0 {
+						return nil, fmt.Errorf("unexpected response: %s", diff)
+					}
+
+					state["rolebinding"] = proto.MarshalTextString(res)
+
+					return state, nil
+				},
+			},
+			{
+				Name: "authorize the machine user",
+				Run: func(state automatedtest.State, logger *zap.Logger) (automatedtest.State, error) {
+					var permission v1alpha.Permission
+					err := proto.UnmarshalText(state["permission"], &permission)
+					if err != nil {
+						return nil, err
+					}
+
+					var machineUser v1alpha.MachineUser
+					err = proto.UnmarshalText(state["machineuser"], &machineUser)
+					if err != nil {
+						return nil, err
+					}
+
+					res, err := c.AuthorizeMachineUser(context.Background(), &admin.AuthorizeMachineUserRequest{
+						ApiKey:     machineUser.GetApiKey(),
+						Permission: permission.GetName(),
+						Parent:     "projects//",
+					})
+					if err != nil {
+						return nil, err
+					}
+
+					expected := &admin.AuthorizeMachineUserResponse{
+						MachineUser: &v1alpha.MachineUser{
+							Name:        machineUser.GetName(),
+							DisplayName: machineUser.GetDisplayName(),
+							Parent:      machineUser.GetParent(),
+						},
+					}
+
+					if diff := cmp.Diff(expected, res, protocmp.Transform()); len(diff) != 0 {
 						return nil, fmt.Errorf("unexpected response: %s", diff)
 					}
 

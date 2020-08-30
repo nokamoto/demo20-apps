@@ -65,8 +65,8 @@ github.com/mattn/go-sqlite3 v1.14.0 h1:mLyGNKR8+Vv9CAU7PphKa2hkEqxxhn8i32J6FPj1/
 github.com/mattn/go-sqlite3 v1.14.0/go.mod h1:JIl7NbARA7phWnGvh0LKTyg7S9BA+6gx71ShQilpsus=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
-github.com/nokamoto/demo20-apis v0.0.0-20200830105136-ad2de2f207a8 h1:mKhtfUlyhvp9laE9CPNJefcvZ/x6RGhI9HRMEvh9brA=
-github.com/nokamoto/demo20-apis v0.0.0-20200830105136-ad2de2f207a8/go.mod h1:dRjdJao9O/ndlvM818wU1PIKwTbxyU+f43kvMtk4zHU=
+github.com/nokamoto/demo20-apis v0.0.0-20200830121822-7d2310d3a675 h1:DznGDzhKAMgvhPDvcLxrYXlgfDD8hqV5fct73vSGPZw=
+github.com/nokamoto/demo20-apis v0.0.0-20200830121822-7d2310d3a675/go.mod h1:dRjdJao9O/ndlvM818wU1PIKwTbxyU+f43kvMtk4zHU=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

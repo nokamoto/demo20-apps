@@ -54,9 +54,9 @@ func (xs bulkRolePermission) Fields() []string {
 
 // RoleBinding represents a role_binding table.
 type RoleBinding struct {
-	RoleKey   int64  `gorm:"column:role_key"`
-	User      string `gorm:"column:user"`
-	ParentKey int64  `gorm:"column:parent_key"`
+	RoleKey  int64  `gorm:"column:role_key"`
+	User     string `gorm:"column:user"`
+	ParentID string `gorm:"column:parent_id"`
 }
 
 // TableName returns a table name.
