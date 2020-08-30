@@ -48,6 +48,41 @@ func (mr *MockpermissionQueryMockRecorder) Create(arg0, arg1 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockpermissionQuery)(nil).Create), arg0, arg1)
 }
 
+// List mocks base method
+func (m *MockpermissionQuery) List(tx *gorm.DB, permissionIDs ...string) ([]*iam.Permission, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{tx}
+	for _, a := range permissionIDs {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "List", varargs...)
+	ret0, _ := ret[0].([]*iam.Permission)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// List indicates an expected call of List
+func (mr *MockpermissionQueryMockRecorder) List(tx interface{}, permissionIDs ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{tx}, permissionIDs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockpermissionQuery)(nil).List), varargs...)
+}
+
+// Hierachy mocks base method
+func (m *MockpermissionQuery) Hierachy(tx *gorm.DB, user string, hierarchy []string) ([]*iam.Permission, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Hierachy", tx, user, hierarchy)
+	ret0, _ := ret[0].([]*iam.Permission)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Hierachy indicates an expected call of Hierachy
+func (mr *MockpermissionQueryMockRecorder) Hierachy(tx, user, hierarchy interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Hierachy", reflect.TypeOf((*MockpermissionQuery)(nil).Hierachy), tx, user, hierarchy)
+}
+
 // MockmachineUserQuery is a mock of machineUserQuery interface
 type MockmachineUserQuery struct {
 	ctrl     *gomock.Controller
@@ -83,4 +118,114 @@ func (m *MockmachineUserQuery) Create(arg0 *gorm.DB, arg1 *iam.MachineUser) erro
 func (mr *MockmachineUserQueryMockRecorder) Create(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockmachineUserQuery)(nil).Create), arg0, arg1)
+}
+
+// Get mocks base method
+func (m *MockmachineUserQuery) Get(arg0 *gorm.DB, arg1 string) (*iam.MachineUser, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", arg0, arg1)
+	ret0, _ := ret[0].(*iam.MachineUser)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get
+func (mr *MockmachineUserQueryMockRecorder) Get(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockmachineUserQuery)(nil).Get), arg0, arg1)
+}
+
+// MockroleQuery is a mock of roleQuery interface
+type MockroleQuery struct {
+	ctrl     *gomock.Controller
+	recorder *MockroleQueryMockRecorder
+}
+
+// MockroleQueryMockRecorder is the mock recorder for MockroleQuery
+type MockroleQueryMockRecorder struct {
+	mock *MockroleQuery
+}
+
+// NewMockroleQuery creates a new mock instance
+func NewMockroleQuery(ctrl *gomock.Controller) *MockroleQuery {
+	mock := &MockroleQuery{ctrl: ctrl}
+	mock.recorder = &MockroleQueryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockroleQuery) EXPECT() *MockroleQueryMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method
+func (m *MockroleQuery) Create(tx *gorm.DB, role *iam.Role, permissions ...*iam.Permission) error {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{tx, role}
+	for _, a := range permissions {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Create", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Create indicates an expected call of Create
+func (mr *MockroleQueryMockRecorder) Create(tx, role interface{}, permissions ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{tx, role}, permissions...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockroleQuery)(nil).Create), varargs...)
+}
+
+// Get mocks base method
+func (m *MockroleQuery) Get(tx *gorm.DB, id string) (*iam.Role, []*iam.RolePermission, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", tx, id)
+	ret0, _ := ret[0].(*iam.Role)
+	ret1, _ := ret[1].([]*iam.RolePermission)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// Get indicates an expected call of Get
+func (mr *MockroleQueryMockRecorder) Get(tx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockroleQuery)(nil).Get), tx, id)
+}
+
+// MockroleBindingQuery is a mock of roleBindingQuery interface
+type MockroleBindingQuery struct {
+	ctrl     *gomock.Controller
+	recorder *MockroleBindingQueryMockRecorder
+}
+
+// MockroleBindingQueryMockRecorder is the mock recorder for MockroleBindingQuery
+type MockroleBindingQueryMockRecorder struct {
+	mock *MockroleBindingQuery
+}
+
+// NewMockroleBindingQuery creates a new mock instance
+func NewMockroleBindingQuery(ctrl *gomock.Controller) *MockroleBindingQuery {
+	mock := &MockroleBindingQuery{ctrl: ctrl}
+	mock.recorder = &MockroleBindingQueryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockroleBindingQuery) EXPECT() *MockroleBindingQueryMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method
+func (m *MockroleBindingQuery) Create(tx *gorm.DB, roleBinding *iam.RoleBinding) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", tx, roleBinding)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Create indicates an expected call of Create
+func (mr *MockroleBindingQueryMockRecorder) Create(tx, roleBinding interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockroleBindingQuery)(nil).Create), tx, roleBinding)
 }

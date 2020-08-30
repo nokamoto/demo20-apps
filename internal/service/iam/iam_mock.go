@@ -62,3 +62,63 @@ func (mr *MockiamMockRecorder) CreateMachineUser(arg0, arg1 interface{}) *gomock
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMachineUser", reflect.TypeOf((*Mockiam)(nil).CreateMachineUser), arg0, arg1)
 }
+
+// AuthenticateMachineUser mocks base method
+func (m *Mockiam) AuthenticateMachineUser(arg0 string) (*v1alpha.MachineUser, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AuthenticateMachineUser", arg0)
+	ret0, _ := ret[0].(*v1alpha.MachineUser)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AuthenticateMachineUser indicates an expected call of AuthenticateMachineUser
+func (mr *MockiamMockRecorder) AuthenticateMachineUser(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AuthenticateMachineUser", reflect.TypeOf((*Mockiam)(nil).AuthenticateMachineUser), arg0)
+}
+
+// AuthorizeMachineUser mocks base method
+func (m *Mockiam) AuthorizeMachineUser(arg0 *v1alpha.MachineUser, arg1, arg2 string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AuthorizeMachineUser", arg0, arg1, arg2)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AuthorizeMachineUser indicates an expected call of AuthorizeMachineUser
+func (mr *MockiamMockRecorder) AuthorizeMachineUser(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AuthorizeMachineUser", reflect.TypeOf((*Mockiam)(nil).AuthorizeMachineUser), arg0, arg1, arg2)
+}
+
+// CreateRole mocks base method
+func (m *Mockiam) CreateRole(id, parentID string, role *v1alpha.Role) (*v1alpha.Role, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateRole", id, parentID, role)
+	ret0, _ := ret[0].(*v1alpha.Role)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRole indicates an expected call of CreateRole
+func (mr *MockiamMockRecorder) CreateRole(id, parentID, role interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRole", reflect.TypeOf((*Mockiam)(nil).CreateRole), id, parentID, role)
+}
+
+// AddRoleBinding mocks base method
+func (m *Mockiam) AddRoleBinding(parentID string, roleBinding *v1alpha.RoleBinding) (*v1alpha.RoleBinding, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddRoleBinding", parentID, roleBinding)
+	ret0, _ := ret[0].(*v1alpha.RoleBinding)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddRoleBinding indicates an expected call of AddRoleBinding
+func (mr *MockiamMockRecorder) AddRoleBinding(parentID, roleBinding interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddRoleBinding", reflect.TypeOf((*Mockiam)(nil).AddRoleBinding), parentID, roleBinding)
+}

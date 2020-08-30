@@ -28,6 +28,19 @@ func (PermissionQuery) List(tx *gorm.DB, permissionIDs ...string) ([]*Permission
 	return permissions, nil
 }
 
+// Hierachy retrives all permissions in the role binding hierarchy.
+func (PermissionQuery) Hierachy(tx *gorm.DB, user string, hierarchy []string) ([]*Permission, error) {
+	var permissions []*Permission
+
+	res := tx.Debug().Raw(`SELECT * FROM iam_permission WHERE permission_key in (
+		SELECT permission_key FROM iam_role WHERE role_key in (
+			SELECT role_key FROM iam_role_binding WHERE user = ? and parent_id in (?)
+		)
+	)`, user, hierarchy).Scan(&permissions)
+
+	return permissions, mysql.Translate(res.Error)
+}
+
 // RoleQuery defines quries for role tables within a transaction.
 type RoleQuery struct{}
 
@@ -144,15 +157,15 @@ func (RoleBindingQuery) Delete(tx *gorm.DB, roleBinding *RoleBinding) error {
 	return mysql.Delete(
 		tx,
 		&RoleBinding{},
-		"role_key = ? and user = ? and parent_key = ?",
-		roleBinding.RoleKey, roleBinding.User, roleBinding.ParentKey,
+		"role_key = ? and user = ? and parent_id = ?",
+		roleBinding.RoleKey, roleBinding.User, roleBinding.ParentID,
 	)
 }
 
 // List returns role binding records by the parent key.
-func (RoleBindingQuery) List(tx *gorm.DB, parentKey int64, offset, limit int) ([]*RoleBinding, error) {
+func (RoleBindingQuery) List(tx *gorm.DB, parentID string, offset, limit int) ([]*RoleBinding, error) {
 	var roleBindings []*RoleBinding
-	return roleBindings, mysql.List(tx, &roleBindings, offset, limit, "parent_key = ?", parentKey)
+	return roleBindings, mysql.List(tx, &roleBindings, offset, limit, "parent_id = ?", parentID)
 }
 
 // MachineUserQuery defines queries for a machine user table within a transaction.
@@ -161,4 +174,10 @@ type MachineUserQuery struct{}
 // Create inserts the machine user record.
 func (MachineUserQuery) Create(tx *gorm.DB, machineUser *MachineUser) error {
 	return mysql.Create(tx, machineUser)
+}
+
+// Get returns a machine user by the machine user id.
+func (MachineUserQuery) Get(tx *gorm.DB, machineUserID string) (*MachineUser, error) {
+	var machineUser MachineUser
+	return &machineUser, mysql.Get(tx, &machineUser, "machine_user_id = ?", machineUserID)
 }

@@ -21,6 +21,29 @@ CREATE TABLE iam_permission (
     permission_id VARCHAR(256) UNIQUE
 );
 
+CREATE TABLE iam_role (
+    role_key BIGINT PRIMARY KEY AUTO_INCREMENT,
+    role_id VARCHAR(256) UNIQUE,
+    parent_id VARCHAR(256),
+    display_name VARCHAR(256),
+    FOREIGN KEY (parent_id) REFERENCES resourcemanager_project (project_id)
+);
+
+CREATE TABLE iam_role_permission (
+    role_key BIGINT,
+    permission_key BIGINT,
+    FOREIGN KEY (role_key) REFERENCES iam_role (role_key),
+    FOREIGN KEY (permission_key) REFERENCES iam_permission (permission_key)
+);
+
+CREATE TABLE iam_role_binding (
+    role_key BIGINT,
+    user VARCHAR(256),
+    parent_id VARCHAR(256),
+    FOREIGN KEY (role_key) REFERENCES iam_role (role_key),
+    FOREIGN KEY (parent_id) REFERENCES resourcemanager_project (project_id)
+);
+
 CREATE TABLE iam_machine_user (
     machine_user_key BIGINT PRIMARY KEY AUTO_INCREMENT,
     machine_user_id VARCHAR(256) UNIQUE,

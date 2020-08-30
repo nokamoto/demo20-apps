@@ -14,6 +14,8 @@ var (
 	ErrAlreadyExists = errors.New("already exists")
 	// ErrInternal represents an unexpected condition. It recommends to print the error message if caught.
 	ErrInternal = errors.New("internal")
+	// ErrPermissionDenied represents a resouce is not accessible.
+	ErrPermissionDenied = errors.New("permission denied")
 )
 
 // ErrorCode is an internal error number for ErrorMap.
@@ -29,6 +31,8 @@ const (
 	AlreadyExists
 	// Internal is ErrorCode corresponding to ErrInternal.
 	Internal
+	// PermissionDenied is ErrorCode corresponding to ErrPermissionDenied.
+	PermissionDenied
 )
 
 // Error converts the mysql error to an application error using the error map.

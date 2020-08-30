@@ -25,3 +25,27 @@ func FromName(name string, res *[]string, collectionIDs ...string) error {
 
 	return nil
 }
+
+// NameOr returns an error if the name if not in the form of collection ids.
+func NameOr(name string, collectionIDs []string, orIDs []string) error {
+	e := fmt.Errorf("%s: unexpected name: %v or %v", name, collectionIDs, orIDs)
+	ids := strings.Split(name, "/")
+
+	test := func(xs []string) bool {
+		if len(ids) != len(xs)*2 {
+			return false
+		}
+		for i, x := range xs {
+			if ids[i*2] != x {
+				return false
+			}
+		}
+		return true
+	}
+
+	if test(collectionIDs) || test(orIDs) {
+		return nil
+	}
+
+	return e
+}

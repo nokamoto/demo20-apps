@@ -50,6 +50,10 @@ func (i *InCall) Error(err error) error {
 		i.Logger.Error("internal", zap.Error(err))
 		return status.Error(codes.Internal, "internal")
 	}
+	if errors.Is(err, application.ErrPermissionDenied) {
+		i.Logger.Debug("permission denied", zap.Error(err))
+		return status.Error(codes.PermissionDenied, "permission denied")
+	}
 
 	i.Logger.Error("unhandled error: unavailable", zap.Error(err))
 	return status.Error(codes.Unavailable, "unavailable")
