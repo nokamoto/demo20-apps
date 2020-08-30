@@ -4,11 +4,10 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/nokamoto/demo20-apps/internal/test"
-
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
 	"github.com/nokamoto/demo20-apps/internal/mysql"
+	"github.com/nokamoto/demo20-apps/internal/test"
 )
 
 func TestPermissionQuery_Create(t *testing.T) {

@@ -63,3 +63,16 @@ type RoleBinding struct {
 func (RoleBinding) TableName() string {
 	return "iam_role_binding"
 }
+
+// MachineUser represents a machine_user table.
+type MachineUser struct {
+	MachineUserKey int64  `gorm:"column:machine_user_key;auto_increment;primary_key"`
+	MachineUserID  string `gorm:"column:machine_user_id"`
+	DisplayName    string `gorm:"column:display_name"`
+	ParentID       string `gorm:"column:parent_id"`
+}
+
+// TableName returns a table name.
+func (MachineUser) TableName() string {
+	return "iam_machine_user"
+}

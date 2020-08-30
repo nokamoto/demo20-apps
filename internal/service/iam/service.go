@@ -45,3 +45,27 @@ func (s *service) CreatePermission(ctx context.Context, req *admin.CreatePermiss
 
 	return res, nil
 }
+
+func (s *service) validateCreateMachineUser(ctx context.Context, req *admin.CreateMachineUserRequest) []error {
+	return validation.Concat(
+		validation.Empty(req.GetMachineUser().GetName()),
+		validation.Empty(req.GetMachineUser().GetApiKey()),
+	)
+}
+
+// CreateMachineUser creates a machine user.
+func (s *service) CreateMachineUser(ctx context.Context, req *admin.CreateMachineUserRequest) (*v1alpha.MachineUser, error) {
+	scoped := incall.NewInCall(s.logger, "CreatePermission", req)
+
+	errs := s.validateCreateMachineUser(ctx, req)
+	if len(errs) != 0 {
+		return nil, scoped.InvalidArgument(errs)
+	}
+
+	res, err := s.iam.CreateMachineUser("/", req.GetMachineUser())
+	if err != nil {
+		return nil, scoped.Error(err)
+	}
+
+	return res, nil
+}

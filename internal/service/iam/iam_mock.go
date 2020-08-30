@@ -47,3 +47,18 @@ func (mr *MockiamMockRecorder) Create(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*Mockiam)(nil).Create), arg0)
 }
+
+// CreateMachineUser mocks base method
+func (m *Mockiam) CreateMachineUser(arg0 string, arg1 *v1alpha.MachineUser) (*v1alpha.MachineUser, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateMachineUser", arg0, arg1)
+	ret0, _ := ret[0].(*v1alpha.MachineUser)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateMachineUser indicates an expected call of CreateMachineUser
+func (mr *MockiamMockRecorder) CreateMachineUser(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMachineUser", reflect.TypeOf((*Mockiam)(nil).CreateMachineUser), arg0, arg1)
+}
