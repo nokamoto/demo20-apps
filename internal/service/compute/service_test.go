@@ -4,6 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/nokamoto/demo20-apis/cloud/api"
+	"github.com/nokamoto/demo20-apps/pkg/sdk/metadata"
+
 	"github.com/nokamoto/demo20-apis/cloud/compute/v1alpha"
 	"google.golang.org/grpc/codes"
 
@@ -41,9 +44,9 @@ func (xs testCases) run(t *testing.T) {
 }
 
 func Test_service_CreateInstance(t *testing.T) {
-	run := func(req *v1alpha.CreateInstanceRequest, expected *v1alpha.Instance) func(*testing.T, *service) error {
+	run := func(ctx context.Context, req *v1alpha.CreateInstanceRequest, expected *v1alpha.Instance) func(*testing.T, *service) error {
 		return func(t *testing.T, s *service) error {
-			return test.Diff1IgnoreUnexported(s.CreateInstance(context.Background(), req))(t, expected)
+			return test.Diff1IgnoreUnexported(s.CreateInstance(ctx, req))(t, expected)
 		}
 	}
 
@@ -51,29 +54,32 @@ func Test_service_CreateInstance(t *testing.T) {
 		{
 			name: "OK",
 			run: run(
+				metadata.NewIncomingContextF(context.Background(), &api.Metadata{
+					Parent: "projects/test",
+				}),
 				&v1alpha.CreateInstanceRequest{
 					Instance: &v1alpha.Instance{
 						Labels: []string{"baz", "qux"},
 					},
 				},
 				&v1alpha.Instance{
-					Name:   "instances/todo-xyz",
-					Parent: "projects/todo",
+					Name:   "instances/test-xyz",
+					Parent: "projects/test",
 					Labels: []string{"baz", "qux"},
 				},
 			),
 			mock: func(c *Mockcompute) {
 				gomock.InOrder(
-					c.EXPECT().RandomName("todo").Return("todo-xyz"),
+					c.EXPECT().RandomName("test").Return("test-xyz"),
 					c.EXPECT().Create(
-						"todo-xyz",
-						"todo",
+						"test-xyz",
+						"test",
 						&v1alpha.Instance{
 							Labels: []string{"baz", "qux"},
 						},
 					).Return(&v1alpha.Instance{
-						Name:   "instances/todo-xyz",
-						Parent: "projects/todo",
+						Name:   "instances/test-xyz",
+						Parent: "projects/test",
 						Labels: []string{"baz", "qux"},
 					}, nil),
 				)

@@ -20,10 +20,10 @@ func NewService(rdb rdb, logger *zap.Logger) v1alpha.RdbServer {
 	return &service{rdb: rdb, logger: logger}
 }
 
-func (s *service) validateCreateCluster(ctx context.Context, req *v1alpha.CreateClusterRequest) (string, string, []error) {
-	id := req.GetClusterId()
-	parentID := "todo"
-	return id, parentID, validation.Concat(
+func (s *service) validateCreateCluster(ctx context.Context, req *v1alpha.CreateClusterRequest) (string, []error) {
+	parentID, err := validation.ProjectIncomingContext(ctx)
+	return parentID, validation.Concat(
+		err,
 		validation.ID(req.GetClusterId()),
 		validation.Empty(req.GetCluster().GetName()),
 		validation.Empty(req.GetCluster().GetParent()),
@@ -36,12 +36,12 @@ func (s *service) validateCreateCluster(ctx context.Context, req *v1alpha.Create
 func (s *service) CreateCluster(ctx context.Context, req *v1alpha.CreateClusterRequest) (*v1alpha.Cluster, error) {
 	scoped := incall.NewInCall(s.logger, "GetProject", req)
 
-	id, parentID, errs := s.validateCreateCluster(ctx, req)
+	parentID, errs := s.validateCreateCluster(ctx, req)
 	if len(errs) != 0 {
 		return nil, scoped.InvalidArgument(errs)
 	}
 
-	res, err := s.rdb.Create(ctx, id, parentID, req.GetCluster())
+	res, err := s.rdb.Create(req.GetClusterId(), parentID, req.GetCluster())
 	if err != nil {
 		return nil, scoped.Error(err)
 	}

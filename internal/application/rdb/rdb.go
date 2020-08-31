@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/nokamoto/demo20-apis/cloud/api"
+	"github.com/nokamoto/demo20-apps/pkg/sdk/metadata"
+
 	"github.com/jinzhu/gorm"
 	compute "github.com/nokamoto/demo20-apis/cloud/compute/v1alpha"
 	"github.com/nokamoto/demo20-apis/cloud/rdb/v1alpha"
@@ -62,7 +65,14 @@ func (r *Rdb) createInstances(ctx context.Context, parentID string, size int) ([
 }
 
 // Create creates a cluster with creating cloud compute instances.
-func (r *Rdb) Create(ctx context.Context, id, parentID string, cluster *v1alpha.Cluster) (*v1alpha.Cluster, error) {
+func (r *Rdb) Create(id, parentID string, cluster *v1alpha.Cluster) (*v1alpha.Cluster, error) {
+	ctx, err := metadata.AppendToOutgoingContext(context.Background(), &api.Metadata{
+		Parent: fmt.Sprintf("projects/%s", parentID),
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	instanceIDs, instanceNames, err := r.createInstances(ctx, parentID, int(cluster.GetReplicas()))
 	if err != nil {
 		return nil, err

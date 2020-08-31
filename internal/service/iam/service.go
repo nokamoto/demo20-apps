@@ -24,6 +24,8 @@ type createPermissionRequest interface {
 	GetPermission() *v1alpha.Permission
 }
 
+type projectFromIncomingContext func(context.Context) (string, error)
+
 func (s *service) validateCreatePermission(ctx context.Context, req createPermissionRequest) []error {
 	return validation.Concat(
 		validation.ID(req.GetPermissionId()),
@@ -53,23 +55,25 @@ type createMachineUserRequest interface {
 	GetMachineUser() *v1alpha.MachineUser
 }
 
-func (s *service) validateCreateMachineUser(ctx context.Context, req createMachineUserRequest) []error {
-	return validation.Concat(
+func (s *service) validateCreateMachineUser(ctx context.Context, req createMachineUserRequest, project projectFromIncomingContext) (string, []error) {
+	id, err := project(ctx)
+	return id, validation.Concat(
+		err,
 		validation.Empty(req.GetMachineUser().GetName()),
 		validation.Empty(req.GetMachineUser().GetApiKey()),
 	)
 }
 
 // CreateMachineUser creates a machine user.
-func (s *service) CreateMachineUser(ctx context.Context, req createMachineUserRequest, parentID string) (*v1alpha.MachineUser, error) {
+func (s *service) CreateMachineUser(ctx context.Context, req createMachineUserRequest, project projectFromIncomingContext) (*v1alpha.MachineUser, error) {
 	scoped := incall.NewInCall(s.logger, "CreateMachineUser", req)
 
-	errs := s.validateCreateMachineUser(ctx, req)
+	projectID, errs := s.validateCreateMachineUser(ctx, req, project)
 	if len(errs) != 0 {
 		return nil, scoped.InvalidArgument(errs)
 	}
 
-	res, err := s.iam.CreateMachineUser(parentID, req.GetMachineUser())
+	res, err := s.iam.CreateMachineUser(projectID, req.GetMachineUser())
 	if err != nil {
 		return nil, scoped.Error(err)
 	}
@@ -113,8 +117,10 @@ type createRoleRequest interface {
 	GetRole() *v1alpha.Role
 }
 
-func (s *service) validateCreateRole(ctx context.Context, req createRoleRequest) []error {
-	return validation.Concat(
+func (s *service) validateCreateRole(ctx context.Context, req createRoleRequest, project projectFromIncomingContext) (string, []error) {
+	id, err := project(ctx)
+	return id, validation.Concat(
+		err,
 		validation.ID(req.GetRoleId()),
 		validation.Empty(req.GetRole().GetName()),
 		validation.Empty(req.GetRole().GetParent()),
@@ -122,15 +128,15 @@ func (s *service) validateCreateRole(ctx context.Context, req createRoleRequest)
 }
 
 // CreateRole creates a role.
-func (s *service) CreateRole(ctx context.Context, req createRoleRequest, parentID string) (*v1alpha.Role, error) {
+func (s *service) CreateRole(ctx context.Context, req createRoleRequest, project projectFromIncomingContext) (*v1alpha.Role, error) {
 	scoped := incall.NewInCall(s.logger, "CreateRole", req)
 
-	errs := s.validateCreateRole(ctx, req)
+	projectID, errs := s.validateCreateRole(ctx, req, project)
 	if len(errs) != 0 {
 		return nil, scoped.InvalidArgument(errs)
 	}
 
-	res, err := s.iam.CreateRole(req.GetRoleId(), parentID, req.GetRole())
+	res, err := s.iam.CreateRole(req.GetRoleId(), projectID, req.GetRole())
 	if err != nil {
 		return nil, scoped.Error(err)
 	}
@@ -143,23 +149,25 @@ type addRoleBindingRequest interface {
 	GetRoleBinding() *v1alpha.RoleBinding
 }
 
-func (s *service) validateAddRoleBinding(ctx context.Context, req addRoleBindingRequest) []error {
-	return validation.Concat(
+func (s *service) validateAddRoleBinding(ctx context.Context, req addRoleBindingRequest, project projectFromIncomingContext) (string, []error) {
+	id, err := project(ctx)
+	return id, validation.Concat(
+		err,
 		validation.NameOr(req.GetRoleBinding().GetRole(), []string{"roles"}, []string{"projects", "roles"}),
 		validation.Empty(req.GetRoleBinding().GetParent()),
 	)
 }
 
 // AddRoleBinding creates a role binding.
-func (s *service) AddRoleBinding(ctx context.Context, req addRoleBindingRequest, parentID string) (*v1alpha.RoleBinding, error) {
+func (s *service) AddRoleBinding(ctx context.Context, req addRoleBindingRequest, project projectFromIncomingContext) (*v1alpha.RoleBinding, error) {
 	scoped := incall.NewInCall(s.logger, "AddRoleBinding", req)
 
-	errs := s.validateAddRoleBinding(ctx, req)
+	projectID, errs := s.validateAddRoleBinding(ctx, req, project)
 	if len(errs) != 0 {
 		return nil, scoped.InvalidArgument(errs)
 	}
 
-	res, err := s.iam.AddRoleBinding(parentID, req.GetRoleBinding())
+	res, err := s.iam.AddRoleBinding(projectID, req.GetRoleBinding())
 	if err != nil {
 		return nil, scoped.Error(err)
 	}

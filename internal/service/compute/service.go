@@ -25,7 +25,9 @@ func NewService(compute compute, logger *zap.Logger) v1alpha.ComputeServer {
 }
 
 func (s *service) validateCreateInstance(ctx context.Context, req *v1alpha.CreateInstanceRequest) (string, []error) {
-	return "todo", validation.Concat(
+	id, err := validation.ProjectIncomingContext(ctx)
+	return id, validation.Concat(
+		err,
 		validation.Empty(req.GetInstance().GetName()),
 		validation.Empty(req.GetInstance().GetParent()),
 	)

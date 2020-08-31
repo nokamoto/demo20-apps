@@ -5,7 +5,6 @@
 package rdb
 
 import (
-	context "context"
 	gomock "github.com/golang/mock/gomock"
 	v1alpha "github.com/nokamoto/demo20-apis/cloud/rdb/v1alpha"
 	reflect "reflect"
@@ -35,16 +34,16 @@ func (m *Mockrdb) EXPECT() *MockrdbMockRecorder {
 }
 
 // Create mocks base method
-func (m *Mockrdb) Create(ctx context.Context, id, parentID string, cluster *v1alpha.Cluster) (*v1alpha.Cluster, error) {
+func (m *Mockrdb) Create(id, parentID string, cluster *v1alpha.Cluster) (*v1alpha.Cluster, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, id, parentID, cluster)
+	ret := m.ctrl.Call(m, "Create", id, parentID, cluster)
 	ret0, _ := ret[0].(*v1alpha.Cluster)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create
-func (mr *MockrdbMockRecorder) Create(ctx, id, parentID, cluster interface{}) *gomock.Call {
+func (mr *MockrdbMockRecorder) Create(id, parentID, cluster interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*Mockrdb)(nil).Create), ctx, id, parentID, cluster)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*Mockrdb)(nil).Create), id, parentID, cluster)
 }

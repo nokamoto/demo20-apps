@@ -4,14 +4,15 @@ import (
 	"context"
 	"testing"
 
-	"github.com/nokamoto/demo20-apps/internal/mysql/rdb"
-
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang/mock/gomock"
 	"github.com/jinzhu/gorm"
+	"github.com/nokamoto/demo20-apis/cloud/api"
 	compute "github.com/nokamoto/demo20-apis/cloud/compute/v1alpha"
 	"github.com/nokamoto/demo20-apis/cloud/rdb/v1alpha"
+	"github.com/nokamoto/demo20-apps/internal/mysql/rdb"
 	"github.com/nokamoto/demo20-apps/internal/test"
+	"github.com/nokamoto/demo20-apps/pkg/sdk/metadata"
 )
 
 type testCase struct {
@@ -52,7 +53,7 @@ func (xs testCases) run(t *testing.T) {
 func TestRdb_Create(t *testing.T) {
 	run := func(id, parentID string, cluster, expected *v1alpha.Cluster) func(*testing.T, Rdb) error {
 		return func(t *testing.T, r Rdb) error {
-			return test.Diff1IgnoreUnexported(r.Create(context.Background(), id, parentID, cluster))(t, expected)
+			return test.Diff1IgnoreUnexported(r.Create(id, parentID, cluster))(t, expected)
 		}
 	}
 	xs := testCases{
@@ -72,19 +73,27 @@ func TestRdb_Create(t *testing.T) {
 			),
 			mock: func(c *MockclusterQuery, i *MockinstanceClient) {
 				gomock.InOrder(
-					i.EXPECT().CreateInstance(gomock.Any(), test.ProtoEq(&compute.CreateInstanceRequest{
-						Instance: &compute.Instance{
-							Labels: []string{"rdb", "master"},
-						},
-					})).Return(&compute.Instance{
+					i.EXPECT().CreateInstance(
+						metadata.AppendToOutgoingContextF(context.Background(), &api.Metadata{
+							Parent: "projects/bar",
+						}),
+						test.ProtoEq(&compute.CreateInstanceRequest{
+							Instance: &compute.Instance{
+								Labels: []string{"rdb", "master"},
+							},
+						})).Return(&compute.Instance{
 						Name: "instances/baz",
 					}, nil),
-					i.EXPECT().CreateInstance(gomock.Any(), test.ProtoEq(&compute.CreateInstanceRequest{
-						Instance: &compute.Instance{
+					i.EXPECT().CreateInstance(
+						metadata.AppendToOutgoingContextF(context.Background(), &api.Metadata{
+							Parent: "projects/bar",
+						}),
+						test.ProtoEq(&compute.CreateInstanceRequest{
+							Instance: &compute.Instance{
 
-							Labels: []string{"rdb", "replica"},
-						},
-					})).Return(&compute.Instance{
+								Labels: []string{"rdb", "replica"},
+							},
+						})).Return(&compute.Instance{
 						Name: "instances/qux",
 					}, nil),
 					c.EXPECT().Create(gomock.Any(),

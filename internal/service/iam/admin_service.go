@@ -18,12 +18,16 @@ func NewAdminService(iam iam, logger *zap.Logger) admin.IamServer {
 	return &adminService{service: &service{iam: iam, logger: logger}}
 }
 
+func rootProject(context.Context) (string, error) {
+	return "/", nil
+}
+
 func (a *adminService) CreatePermission(ctx context.Context, req *admin.CreatePermissionRequest) (*v1alpha.Permission, error) {
 	return a.service.CreatePermission(ctx, req)
 }
 
 func (a *adminService) CreateMachineUser(ctx context.Context, req *admin.CreateMachineUserRequest) (*v1alpha.MachineUser, error) {
-	return a.service.CreateMachineUser(ctx, req, "/")
+	return a.service.CreateMachineUser(ctx, req, rootProject)
 }
 
 func (a *adminService) AuthorizeMachineUser(ctx context.Context, req *admin.AuthorizeMachineUserRequest) (*admin.AuthorizeMachineUserResponse, error) {
@@ -31,9 +35,9 @@ func (a *adminService) AuthorizeMachineUser(ctx context.Context, req *admin.Auth
 }
 
 func (a *adminService) CreateRole(ctx context.Context, req *admin.CreateRoleRequest) (*v1alpha.Role, error) {
-	return a.service.CreateRole(ctx, req, "/")
+	return a.service.CreateRole(ctx, req, rootProject)
 }
 
 func (a *adminService) AddRoleBinding(ctx context.Context, req *admin.AddRoleBindingRequest) (*v1alpha.RoleBinding, error) {
-	return a.service.AddRoleBinding(ctx, req, "/")
+	return a.service.AddRoleBinding(ctx, req, rootProject)
 }

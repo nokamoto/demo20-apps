@@ -4,10 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/nokamoto/demo20-apis/cloud/rdb/v1alpha"
-
 	"github.com/golang/mock/gomock"
+	"github.com/nokamoto/demo20-apis/cloud/api"
+	"github.com/nokamoto/demo20-apis/cloud/rdb/v1alpha"
 	"github.com/nokamoto/demo20-apps/internal/test"
+	"github.com/nokamoto/demo20-apps/pkg/sdk/metadata"
 	"go.uber.org/zap/zaptest"
 )
 
@@ -40,9 +41,9 @@ func (xs testCases) run(t *testing.T) {
 }
 
 func Test_service_CreateCluster(t *testing.T) {
-	run := func(req *v1alpha.CreateClusterRequest, expected *v1alpha.Cluster) func(*testing.T, *service) error {
+	run := func(ctx context.Context, req *v1alpha.CreateClusterRequest, expected *v1alpha.Cluster) func(*testing.T, *service) error {
 		return func(t *testing.T, s *service) error {
-			return test.Diff1IgnoreUnexported(s.CreateCluster(context.Background(), req))(t, expected)
+			return test.Diff1IgnoreUnexported(s.CreateCluster(ctx, req))(t, expected)
 		}
 	}
 
@@ -50,6 +51,9 @@ func Test_service_CreateCluster(t *testing.T) {
 		{
 			name: "OK",
 			run: run(
+				metadata.NewIncomingContextF(context.Background(), &api.Metadata{
+					Parent: "projects/test",
+				}),
 				&v1alpha.CreateClusterRequest{
 					ClusterId: "foo",
 					Cluster: &v1alpha.Cluster{
@@ -60,12 +64,12 @@ func Test_service_CreateCluster(t *testing.T) {
 					Name:      "clusters/foo",
 					Replicas:  1,
 					Instances: []string{"bar", "baz"},
-					Parent:    "projects/todo",
+					Parent:    "projects/test",
 				},
 			),
 			mock: func(r *Mockrdb) {
 				r.EXPECT().Create(
-					gomock.Any(), "foo", "todo",
+					"foo", "test",
 					test.ProtoEq(&v1alpha.Cluster{
 						Replicas: 1,
 					}),
@@ -73,7 +77,7 @@ func Test_service_CreateCluster(t *testing.T) {
 					Name:      "clusters/foo",
 					Replicas:  1,
 					Instances: []string{"bar", "baz"},
-					Parent:    "projects/todo",
+					Parent:    "projects/test",
 				}, nil)
 			},
 			check: test.Succeeded,
