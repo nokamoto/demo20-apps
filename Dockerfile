@@ -11,6 +11,7 @@ RUN go mod download
 
 COPY cmd/${cmd} cmd/${cmd}
 COPY internal internal
+COPY pkg pkg
 
 RUN go install ./cmd/${cmd}
 

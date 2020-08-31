@@ -5,8 +5,10 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/nokamoto/demo20-apis/cloud/api"
 	"github.com/nokamoto/demo20-apis/cloud/resourcemanager/v1alpha"
 	"github.com/nokamoto/demo20-apps/internal/test"
+	"github.com/nokamoto/demo20-apps/pkg/sdk/metadata"
 	"go.uber.org/zap/zaptest"
 )
 
@@ -39,9 +41,9 @@ func (xs testCases) run(t *testing.T) {
 }
 
 func Test_service_GetProject(t *testing.T) {
-	run := func(req *v1alpha.GetProjectRequest, expected *v1alpha.Project) func(*testing.T, *service) error {
+	run := func(ctx context.Context, req *v1alpha.GetProjectRequest, expected *v1alpha.Project) func(*testing.T, *service) error {
 		return func(t *testing.T, s *service) error {
-			return test.Diff1IgnoreUnexported(s.GetProject(context.Background(), req))(t, expected)
+			return test.Diff1IgnoreUnexported(s.GetProject(ctx, req))(t, expected)
 		}
 	}
 
@@ -49,9 +51,10 @@ func Test_service_GetProject(t *testing.T) {
 		{
 			name: "OK",
 			run: run(
-				&v1alpha.GetProjectRequest{
-					Name: "projects/foo",
-				},
+				metadata.NewIncomingContextF(context.Background(), &api.Metadata{
+					Parent: "projects/foo",
+				}),
+				&v1alpha.GetProjectRequest{},
 				&v1alpha.Project{
 					Name:        "projects/foo",
 					DisplayName: "foo display name",

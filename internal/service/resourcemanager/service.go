@@ -20,21 +20,21 @@ func NewService(resourcemanager resourcemanager, logger *zap.Logger) v1alpha.Res
 	return &service{resourcemanager: resourcemanager, logger: logger}
 }
 
-func (s *service) validateGetProject(ctx context.Context, req *v1alpha.GetProjectRequest) ([]string, []error) {
-	var ids []string
-	return ids, validation.Concat(validation.FromName(req.GetName(), &ids, "projects"))
+func (s *service) validateGetProject(ctx context.Context, req *v1alpha.GetProjectRequest) (string, []error) {
+	id, err := validation.ProjectIncomingContext(ctx)
+	return id, validation.Concat(err)
 }
 
 // GetProject returns a project.
 func (s *service) GetProject(ctx context.Context, req *v1alpha.GetProjectRequest) (*v1alpha.Project, error) {
 	scoped := incall.NewInCall(s.logger, "GetProject", req)
 
-	ids, errs := s.validateGetProject(ctx, req)
+	parentID, errs := s.validateGetProject(ctx, req)
 	if len(errs) != 0 {
 		return nil, scoped.InvalidArgument(errs)
 	}
 
-	res, err := s.resourcemanager.Get(ids[0])
+	res, err := s.resourcemanager.Get(parentID)
 	if err != nil {
 		return nil, scoped.Error(err)
 	}

@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/nokamoto/demo20-apis/cloud/api"
+	"github.com/nokamoto/demo20-apps/pkg/sdk/metadata"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/google/go-cmp/cmp"
 	admin "github.com/nokamoto/demo20-apis/cloud/iam/admin/v1alpha"
@@ -18,6 +21,10 @@ func main() {
 	automatedtest.Main(func(con *grpc.ClientConn) automatedtest.Scenarios {
 		adminClient := admin.NewIamClient(con)
 		projectClient := v1alpha.NewIamClient(con)
+
+		ctx := metadata.AppendToOutgoingContextF(context.Background(), &api.Metadata{
+			Parent: "projects/todo",
+		})
 
 		return automatedtest.Scenarios{
 			{
@@ -202,7 +209,7 @@ func main() {
 
 					roleID := automatedtest.RandomID()
 
-					res, err := projectClient.CreateRole(context.Background(), &v1alpha.CreateRoleRequest{
+					res, err := projectClient.CreateRole(ctx, &v1alpha.CreateRoleRequest{
 						RoleId: roleID,
 						Role: &v1alpha.Role{
 							DisplayName: "test project role",
@@ -233,7 +240,7 @@ func main() {
 			{
 				Name: "create a project machine user",
 				Run: func(state automatedtest.State, logger *zap.Logger) (automatedtest.State, error) {
-					res, err := projectClient.CreateMachineUser(context.Background(), &v1alpha.CreateMachineUserRequest{
+					res, err := projectClient.CreateMachineUser(ctx, &v1alpha.CreateMachineUserRequest{
 						MachineUser: &v1alpha.MachineUser{
 							DisplayName: "test project machine user",
 						},
@@ -271,7 +278,7 @@ func main() {
 						return nil, err
 					}
 
-					res, err := projectClient.AddRoleBinding(context.Background(), &v1alpha.AddRoleBindingRequest{
+					res, err := projectClient.AddRoleBinding(ctx, &v1alpha.AddRoleBindingRequest{
 						RoleBinding: &v1alpha.RoleBinding{
 							Role: role.GetName(),
 							User: machineUser.GetName(),

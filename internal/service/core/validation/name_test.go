@@ -1,6 +1,10 @@
 package validation
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/google/go-cmp/cmp"
+)
 
 func TestNameOr(t *testing.T) {
 	xs := []string{"roles"}
@@ -24,5 +28,16 @@ func TestNameOr(t *testing.T) {
 	err = NameOr("xxx/foo", xs, ys)
 	if err == nil {
 		t.Fatal("expected err")
+	}
+}
+
+func TestFromName(t *testing.T) {
+	var res []string
+	err := FromName("projects/foo", &res, "projects")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff([]string{"foo"}, res); len(diff) != 0 {
+		t.Error(diff)
 	}
 }

@@ -5,9 +5,10 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/proto"
-
+	"github.com/nokamoto/demo20-apis/cloud/api"
 	"github.com/nokamoto/demo20-apis/cloud/resourcemanager/v1alpha"
 	"github.com/nokamoto/demo20-apps/internal/automatedtest"
+	"github.com/nokamoto/demo20-apps/pkg/sdk/metadata"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
@@ -56,9 +57,14 @@ func main() {
 						return nil, err
 					}
 
-					res, err := c.GetProject(context.Background(), &v1alpha.GetProjectRequest{
-						Name: expected.GetName(),
+					ctx, err := metadata.AppendToOutgoingContext(context.Background(), &api.Metadata{
+						Parent: expected.GetName(),
 					})
+					if err != nil {
+						return nil, err
+					}
+
+					res, err := c.GetProject(ctx, &v1alpha.GetProjectRequest{})
 					if err != nil {
 						return nil, err
 					}
