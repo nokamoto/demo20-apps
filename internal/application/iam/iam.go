@@ -182,8 +182,13 @@ func (i *Iam) CreateRole(id, parentID string, role *v1alpha.Role) (*v1alpha.Role
 		return nil, err
 	}
 
+	name := fmt.Sprintf("roles/%s", id)
+	if parentID != "/" {
+		name = fmt.Sprintf("projects/%s/%s", parentID, name)
+	}
+
 	return &v1alpha.Role{
-		Name:        fmt.Sprintf("roles/%s", id),
+		Name:        name,
 		DisplayName: role.GetDisplayName(),
 		Permissions: role.GetPermissions(),
 		Parent:      fmt.Sprintf("projects/%s", parentID),

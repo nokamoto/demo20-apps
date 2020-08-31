@@ -6,6 +6,13 @@ metadata:
 spec:
   template:
     spec:
+      initContainers:
+      - image: busybox:1.32
+        name: wait-for-iam
+        command:
+        - sh
+        - -c
+        - timeout 60 sh -c 'until nc -z $0 $1; do sleep 1; done' iam 9001
       containers:
       - image: iam-automated-test
         name: iam-automated-test
