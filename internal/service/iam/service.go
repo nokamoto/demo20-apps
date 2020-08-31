@@ -3,29 +3,28 @@ package iam
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	"github.com/nokamoto/demo20-apps/internal/service/core/incall"
-	"github.com/nokamoto/demo20-apps/internal/service/core/validation"
-
+	"github.com/golang/protobuf/proto"
 	admin "github.com/nokamoto/demo20-apis/cloud/iam/admin/v1alpha"
 	"github.com/nokamoto/demo20-apis/cloud/iam/v1alpha"
+	"github.com/nokamoto/demo20-apps/internal/service/core/incall"
+	"github.com/nokamoto/demo20-apps/internal/service/core/validation"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type service struct {
-	iam iam
-	admin.UnimplementedIamServer
+	iam    iam
 	logger *zap.Logger
 }
 
-// NewAdminService returns admin.v1alpha.IamServer.
-func NewAdminService(iam iam, logger *zap.Logger) admin.IamServer {
-	return &service{iam: iam, logger: logger}
+type createPermissionRequest interface {
+	proto.Message
+	GetPermissionId() string
+	GetPermission() *v1alpha.Permission
 }
 
-func (s *service) validateCreatePermission(ctx context.Context, req *admin.CreatePermissionRequest) []error {
+func (s *service) validateCreatePermission(ctx context.Context, req createPermissionRequest) []error {
 	return validation.Concat(
 		validation.ID(req.GetPermissionId()),
 		validation.Empty(req.GetPermission().GetName()),
@@ -33,7 +32,7 @@ func (s *service) validateCreatePermission(ctx context.Context, req *admin.Creat
 }
 
 // CreatePermission creates a permission.
-func (s *service) CreatePermission(ctx context.Context, req *admin.CreatePermissionRequest) (*v1alpha.Permission, error) {
+func (s *service) CreatePermission(ctx context.Context, req createPermissionRequest) (*v1alpha.Permission, error) {
 	scoped := incall.NewInCall(s.logger, "CreatePermission", req)
 
 	errs := s.validateCreatePermission(ctx, req)
@@ -49,7 +48,12 @@ func (s *service) CreatePermission(ctx context.Context, req *admin.CreatePermiss
 	return res, nil
 }
 
-func (s *service) validateCreateMachineUser(ctx context.Context, req *admin.CreateMachineUserRequest) []error {
+type createMachineUserRequest interface {
+	proto.Message
+	GetMachineUser() *v1alpha.MachineUser
+}
+
+func (s *service) validateCreateMachineUser(ctx context.Context, req createMachineUserRequest) []error {
 	return validation.Concat(
 		validation.Empty(req.GetMachineUser().GetName()),
 		validation.Empty(req.GetMachineUser().GetApiKey()),
@@ -57,7 +61,7 @@ func (s *service) validateCreateMachineUser(ctx context.Context, req *admin.Crea
 }
 
 // CreateMachineUser creates a machine user.
-func (s *service) CreateMachineUser(ctx context.Context, req *admin.CreateMachineUserRequest) (*v1alpha.MachineUser, error) {
+func (s *service) CreateMachineUser(ctx context.Context, req createMachineUserRequest, parentID string) (*v1alpha.MachineUser, error) {
 	scoped := incall.NewInCall(s.logger, "CreateMachineUser", req)
 
 	errs := s.validateCreateMachineUser(ctx, req)
@@ -65,7 +69,7 @@ func (s *service) CreateMachineUser(ctx context.Context, req *admin.CreateMachin
 		return nil, scoped.InvalidArgument(errs)
 	}
 
-	res, err := s.iam.CreateMachineUser("/", req.GetMachineUser())
+	res, err := s.iam.CreateMachineUser(parentID, req.GetMachineUser())
 	if err != nil {
 		return nil, scoped.Error(err)
 	}
@@ -73,8 +77,15 @@ func (s *service) CreateMachineUser(ctx context.Context, req *admin.CreateMachin
 	return res, nil
 }
 
+type authorizeMachineUserRequest interface {
+	proto.Message
+	GetApiKey() string
+	GetParent() string
+	GetPermission() string
+}
+
 // AuthorizeMachineUser authorizes the machine user.
-func (s *service) AuthorizeMachineUser(ctx context.Context, req *admin.AuthorizeMachineUserRequest) (*admin.AuthorizeMachineUserResponse, error) {
+func (s *service) AuthorizeMachineUser(ctx context.Context, req authorizeMachineUserRequest) (*admin.AuthorizeMachineUserResponse, error) {
 	scoped := incall.NewInCall(s.logger, "AuthorizeMachineUser", req)
 
 	authn, err := s.iam.AuthenticateMachineUser(req.GetApiKey())
@@ -96,7 +107,13 @@ func (s *service) AuthorizeMachineUser(ctx context.Context, req *admin.Authorize
 	}, nil
 }
 
-func (s *service) validateCreateRole(ctx context.Context, req *admin.CreateRoleRequest) []error {
+type createRoleRequest interface {
+	proto.Message
+	GetRoleId() string
+	GetRole() *v1alpha.Role
+}
+
+func (s *service) validateCreateRole(ctx context.Context, req createRoleRequest) []error {
 	return validation.Concat(
 		validation.ID(req.GetRoleId()),
 		validation.Empty(req.GetRole().GetName()),
@@ -105,7 +122,7 @@ func (s *service) validateCreateRole(ctx context.Context, req *admin.CreateRoleR
 }
 
 // CreateRole creates a role.
-func (s *service) CreateRole(ctx context.Context, req *admin.CreateRoleRequest) (*v1alpha.Role, error) {
+func (s *service) CreateRole(ctx context.Context, req createRoleRequest, parentID string) (*v1alpha.Role, error) {
 	scoped := incall.NewInCall(s.logger, "CreateRole", req)
 
 	errs := s.validateCreateRole(ctx, req)
@@ -113,7 +130,7 @@ func (s *service) CreateRole(ctx context.Context, req *admin.CreateRoleRequest) 
 		return nil, scoped.InvalidArgument(errs)
 	}
 
-	res, err := s.iam.CreateRole(req.GetRoleId(), "/", req.GetRole())
+	res, err := s.iam.CreateRole(req.GetRoleId(), parentID, req.GetRole())
 	if err != nil {
 		return nil, scoped.Error(err)
 	}
@@ -121,7 +138,12 @@ func (s *service) CreateRole(ctx context.Context, req *admin.CreateRoleRequest) 
 	return res, nil
 }
 
-func (s *service) validateAddRoleBinding(ctx context.Context, req *admin.AddRoleBindingRequest) []error {
+type addRoleBindingRequest interface {
+	proto.Message
+	GetRoleBinding() *v1alpha.RoleBinding
+}
+
+func (s *service) validateAddRoleBinding(ctx context.Context, req addRoleBindingRequest) []error {
 	return validation.Concat(
 		validation.NameOr(req.GetRoleBinding().GetRole(), []string{"roles"}, []string{"projects", "roles"}),
 		validation.Empty(req.GetRoleBinding().GetParent()),
@@ -129,7 +151,7 @@ func (s *service) validateAddRoleBinding(ctx context.Context, req *admin.AddRole
 }
 
 // AddRoleBinding creates a role binding.
-func (s *service) AddRoleBinding(ctx context.Context, req *admin.AddRoleBindingRequest) (*v1alpha.RoleBinding, error) {
+func (s *service) AddRoleBinding(ctx context.Context, req addRoleBindingRequest, parentID string) (*v1alpha.RoleBinding, error) {
 	scoped := incall.NewInCall(s.logger, "AddRoleBinding", req)
 
 	errs := s.validateAddRoleBinding(ctx, req)
@@ -137,7 +159,7 @@ func (s *service) AddRoleBinding(ctx context.Context, req *admin.AddRoleBindingR
 		return nil, scoped.InvalidArgument(errs)
 	}
 
-	res, err := s.iam.AddRoleBinding("/", req.GetRoleBinding())
+	res, err := s.iam.AddRoleBinding(parentID, req.GetRoleBinding())
 	if err != nil {
 		return nil, scoped.Error(err)
 	}
