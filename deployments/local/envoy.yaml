@@ -22,6 +22,8 @@ spec:
         - envoy
         - --config-path
         - /etc/envoy/envoy-conf.yaml
+        - --log-level
+        - debug
         volumeMounts:
         - mountPath: /etc/envoy
           name: envoy-conf

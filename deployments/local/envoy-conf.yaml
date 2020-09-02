@@ -22,6 +22,12 @@ static_resources:
               routes:
               - match: { prefix: "/cloud.compute" }
                 route: { cluster: compute }
+              - match: { prefix: "/cloud.iam" }
+                route: { cluster: iam }
+              - match: { prefix: "/cloud.rdb" }
+                route: { cluster: rdb }
+              - match: { prefix: "/cloud.resourcemanager" }
+                route: { cluster: resourcemanager }
           http_filters:
           - name: envoy.router
   clusters:
@@ -30,6 +36,7 @@ static_resources:
     type: STRICT_DNS
     dns_lookup_family: V4_ONLY
     lb_policy: ROUND_ROBIN
+    http2_protocol_options: {}
     load_assignment:
       cluster_name: compute
       endpoints:
@@ -39,3 +46,48 @@ static_resources:
               socket_address:
                 address: compute
                 port_value: 9000
+  - name: iam
+    connect_timeout: 0.25s
+    type: STRICT_DNS
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    http2_protocol_options: {}
+    load_assignment:
+      cluster_name: iam
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: iam
+                port_value: 9001
+  - name: rdb
+    connect_timeout: 0.25s
+    type: STRICT_DNS
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    http2_protocol_options: {}
+    load_assignment:
+      cluster_name: rdb
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: rdb
+                port_value: 9002
+  - name: resourcemanager
+    connect_timeout: 0.25s
+    type: STRICT_DNS
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    http2_protocol_options: {}
+    load_assignment:
+      cluster_name: resourcemanager
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: resourcemanager
+                port_value: 9003
