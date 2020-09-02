@@ -12,11 +12,9 @@ import (
 )
 
 func main() {
-	server.Main(func(logger *zap.Logger, s *grpc.Server, db *gorm.DB) error {
+	server.Main(func(logger *zap.Logger, s *grpc.Server, db *gorm.DB) {
 		admin.RegisterIamServer(s, service.NewAdminService(application.NewIam(db), logger))
 
 		iam.RegisterIamServer(s, service.NewService(application.NewIam(db), logger))
-
-		return nil
 	})
 }

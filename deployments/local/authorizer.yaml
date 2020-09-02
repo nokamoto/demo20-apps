@@ -1,0 +1,49 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: authorizer
+  name: authorizer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authorizer
+  template:
+    metadata:
+      labels:
+        app: authorizer
+    spec:
+      containers:
+      - image: authorizer
+        name: authorizer
+        env:
+        - name: LOGGER_DEBUG
+          value: "1"
+        - name: GRPC_SERVER_PORT
+          value: "9004"
+        - name: CONFIG_PATH
+          value: /etc/authorizer/cloudapis.json
+        volumeMounts:
+        - mountPath: /etc/authorizer
+          name: authorizer-conf
+      volumes:
+      - name: authorizer-conf
+        configMap:
+          name: authorizer-conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: authorizer
+  name: authorizer
+spec:
+  ports:
+  - name: http2
+    port: 9004
+    protocol: TCP
+  selector:
+    app: authorizer
+  type: ClusterIP
