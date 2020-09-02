@@ -1,9 +1,15 @@
 resources:
 - compute.yaml
 - compute-automated-test.yaml
+- envoy.yaml
 - iam.yaml
 - iam-automated-test.yaml
 - rdb.yaml
 - rdb-automated-test.yaml
 - resourcemanager.yaml
 - resourcemanager-automated-test.yaml
+
+configMapGenerator:
+- name: envoy-conf
+  files:
+  - envoy-conf.yaml
