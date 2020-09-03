@@ -12,14 +12,16 @@ import (
 )
 
 const (
-	metadataKey = "x-cloud-metadata"
+	// MetadataKey is a gRPC metadata key for Metadata.
+	MetadataKey = "x-cloud-metadata"
 )
 
 var (
 	enc = base64.RawStdEncoding
 )
 
-func encode(md *api.Metadata) (string, error) {
+// Encode encodes Metadata to a base64 string.
+func Encode(md *api.Metadata) (string, error) {
 	bytes, err := proto.Marshal(md)
 	if err != nil {
 		return "", err
@@ -27,13 +29,29 @@ func encode(md *api.Metadata) (string, error) {
 	return enc.EncodeToString(bytes), nil
 }
 
+// Decode decodes Metadata from the base64 string.
+func Decode(value string) (*api.Metadata, error) {
+	bytes, err := enc.DecodeString(value)
+	if err != nil {
+		return nil, fmt.Errorf("invalid metadata: %w", err)
+	}
+
+	var md api.Metadata
+	err = proto.Unmarshal(bytes, &md)
+	if err != nil {
+		return nil, fmt.Errorf("invalid metadata: %w", err)
+	}
+
+	return &md, nil
+}
+
 // AppendToOutgoingContext appends Metadata to the context.
 func AppendToOutgoingContext(ctx context.Context, md *api.Metadata) (context.Context, error) {
-	s, err := encode(md)
+	s, err := Encode(md)
 	if err != nil {
 		return nil, err
 	}
-	return metadata.AppendToOutgoingContext(ctx, metadataKey, s), nil
+	return metadata.AppendToOutgoingContext(ctx, MetadataKey, s), nil
 }
 
 // AppendToOutgoingContextF appends Metadata to the context for testing.
@@ -47,11 +65,11 @@ func AppendToOutgoingContextF(ctx context.Context, md *api.Metadata) context.Con
 
 // NewIncomingContext appends Metadata to the context.
 func NewIncomingContext(ctx context.Context, md *api.Metadata) (context.Context, error) {
-	s, err := encode(md)
+	s, err := Encode(md)
 	if err != nil {
 		return nil, err
 	}
-	return metadata.NewIncomingContext(ctx, metadata.MD{metadataKey: []string{s}}), nil
+	return metadata.NewIncomingContext(ctx, metadata.MD{MetadataKey: []string{s}}), nil
 }
 
 // NewIncomingContextF appends Metadata to the context for testing.
@@ -68,7 +86,7 @@ func fromMD(md metadata.MD, ok bool) (*api.Metadata, error) {
 		return nil, errors.New("no metadata")
 	}
 
-	xs, ok := md[metadataKey]
+	xs, ok := md[MetadataKey]
 	if !ok {
 		return nil, errors.New("no metadata")
 	}
@@ -76,18 +94,7 @@ func fromMD(md metadata.MD, ok bool) (*api.Metadata, error) {
 		return nil, errors.New("invalid metadata")
 	}
 
-	bytes, err := enc.DecodeString(xs[0])
-	if err != nil {
-		return nil, fmt.Errorf("invalid metadata: %w", err)
-	}
-
-	var value api.Metadata
-	err = proto.Unmarshal(bytes, &value)
-	if err != nil {
-		return nil, fmt.Errorf("invalid metadata: %w", err)
-	}
-
-	return &value, nil
+	return Decode(xs[0])
 }
 
 // FromIncomingContext returns Metadata from the incoming context.

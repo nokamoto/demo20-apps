@@ -14,17 +14,15 @@ import (
 )
 
 func main() {
-	server.Main(func(logger *zap.Logger, s *grpc.Server, db *gorm.DB) error {
+	server.Main(func(logger *zap.Logger, s *grpc.Server, db *gorm.DB) {
 		address := os.Getenv("COMPUTE_GRPC_ADDRESS")
 		conn, err := grpc.Dial(address, grpc.WithInsecure())
 		if err != nil {
-			return err
+			logger.Fatal("failed to create conn", zap.Error(err))
 		}
 
 		compute := compute.NewComputeClient(conn)
 
 		v1alpha.RegisterRdbServer(s, service.NewService(rdb.NewRdb(db, compute), logger))
-
-		return nil
 	})
 }

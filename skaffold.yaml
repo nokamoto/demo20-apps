@@ -4,6 +4,10 @@ metadata:
   name: demo--apps
 build:
   artifacts:
+  - image: authorizer
+    docker:
+      buildArgs:
+        cmd: authorizer
   - image: compute
     docker:
       buildArgs:

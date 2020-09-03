@@ -11,8 +11,7 @@ import (
 )
 
 func main() {
-	server.Main(func(logger *zap.Logger, s *grpc.Server, db *gorm.DB) error {
+	server.Main(func(logger *zap.Logger, s *grpc.Server, db *gorm.DB) {
 		v1alpha.RegisterResourceManagerServer(s, service.NewService(resourcemanager.NewResourceManager(db), logger))
-		return nil
 	})
 }
