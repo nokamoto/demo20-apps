@@ -107,5 +107,5 @@ func main() {
 	}
 	json, err := m.MarshalToString(&cfg)
 	assert(err)
-	assert(ioutil.WriteFile(output, []byte(json), 0644))
+	assert(ioutil.WriteFile(output, []byte(json+"\n"), 0644))
 }
