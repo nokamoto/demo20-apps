@@ -1,1 +1,115 @@
-{}
+{
+  "config": {
+    "/cloud.compute.v1alpha.Compute/CreateInstance": {
+      "permission": "compute.instance.write"
+    },
+    "/cloud.compute.v1alpha.Compute/DeleteInstance": {
+      "permission": "compute.instance.write"
+    },
+    "/cloud.compute.v1alpha.Compute/GetInstance": {
+      "permission": "compute.instance.read"
+    },
+    "/cloud.compute.v1alpha.Compute/ListInstance": {
+      "permission": "compute.instance.read"
+    },
+    "/cloud.iam.admin.v1alpha.Iam/AddRoleBinding": {
+      "insecure": true
+    },
+    "/cloud.iam.admin.v1alpha.Iam/AuthorizeMachineUser": {
+      "insecure": true
+    },
+    "/cloud.iam.admin.v1alpha.Iam/CreateMachineUser": {
+      "insecure": true
+    },
+    "/cloud.iam.admin.v1alpha.Iam/CreatePermission": {
+      "insecure": true
+    },
+    "/cloud.iam.admin.v1alpha.Iam/CreateRole": {
+      "insecure": true
+    },
+    "/cloud.iam.admin.v1alpha.Iam/DeleteMachineUser": {
+      "insecure": true
+    },
+    "/cloud.iam.admin.v1alpha.Iam/DeletePermission": {
+      "insecure": true
+    },
+    "/cloud.iam.admin.v1alpha.Iam/DeleteRole": {
+      "insecure": true
+    },
+    "/cloud.iam.admin.v1alpha.Iam/GetRole": {
+      "insecure": true
+    },
+    "/cloud.iam.admin.v1alpha.Iam/ListMachineUser": {
+      "insecure": true
+    },
+    "/cloud.iam.admin.v1alpha.Iam/ListRole": {
+      "insecure": true
+    },
+    "/cloud.iam.admin.v1alpha.Iam/ListRoleBinding": {
+      "insecure": true
+    },
+    "/cloud.iam.admin.v1alpha.Iam/RemoveRoleBinding": {
+      "insecure": true
+    },
+    "/cloud.iam.admin.v1alpha.Iam/UpdateRole": {
+      "insecure": true
+    },
+    "/cloud.iam.v1alpha.Iam/AddRoleBinding": {
+      "permission": "iam.rolebinding.write"
+    },
+    "/cloud.iam.v1alpha.Iam/CreateMachineUser": {
+      "permission": "iam.rolebinding.read"
+    },
+    "/cloud.iam.v1alpha.Iam/CreateRole": {
+      "permission": "iam.role.write"
+    },
+    "/cloud.iam.v1alpha.Iam/DeleteMachineUser": {
+      "permission": "iam.rolebinding.read"
+    },
+    "/cloud.iam.v1alpha.Iam/DeleteRole": {
+      "permission": "iam.role.write"
+    },
+    "/cloud.iam.v1alpha.Iam/GetRole": {
+      "permission": "iam.role.read"
+    },
+    "/cloud.iam.v1alpha.Iam/ListMachineUser": {
+      "permission": "iam.rolebinding.read"
+    },
+    "/cloud.iam.v1alpha.Iam/ListRole": {
+      "permission": "iam.role.read"
+    },
+    "/cloud.iam.v1alpha.Iam/ListRoleBinding": {
+      "permission": "iam.rolebinding.read"
+    },
+    "/cloud.iam.v1alpha.Iam/RemoveRoleBinding": {
+      "permission": "iam.rolebinding.write"
+    },
+    "/cloud.iam.v1alpha.Iam/UpdateRole": {
+      "permission": "iam.role.write"
+    },
+    "/cloud.rdb.v1alpha.Rdb/CreateCluster": {
+      "permission": "rdb.cluster.write"
+    },
+    "/cloud.rdb.v1alpha.Rdb/DeleteCluster": {
+      "permission": "rdb.cluster.write"
+    },
+    "/cloud.rdb.v1alpha.Rdb/GetCluster": {
+      "permission": "rdb.cluster.read"
+    },
+    "/cloud.rdb.v1alpha.Rdb/ListCluster": {
+      "permission": "rdb.cluster.read"
+    },
+    "/cloud.rdb.v1alpha.Rdb/UpdateCluster": {
+      "permission": "rdb.cluster.write"
+    },
+    "/cloud.resourcemanager.v1alhpa.ResourceManager/CreateProject": {
+      "insecure": true
+    },
+    "/cloud.resourcemanager.v1alhpa.ResourceManager/GetProject": {
+      "permission": "resourcemanager.project.read"
+    },
+    "/cloud.resourcemanager.v1alhpa.ResourceManager/UpdateProject": {
+      "permission": "resourcemanager.project.write"
+    }
+  }
+}
