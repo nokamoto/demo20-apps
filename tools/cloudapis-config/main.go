@@ -102,8 +102,10 @@ func main() {
 		}
 	}
 
-	m := jsonpb.Marshaler{}
+	m := jsonpb.Marshaler{
+		Indent: "  ",
+	}
 	json, err := m.MarshalToString(&cfg)
 	assert(err)
-	assert(ioutil.WriteFile(output, []byte(json), 0644))
+	assert(ioutil.WriteFile(output, []byte(json+"\n"), 0644))
 }
