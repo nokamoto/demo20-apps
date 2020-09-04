@@ -16,6 +16,7 @@ func (c *ConfigLoader) Read(filename string) (*api.AuthzConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	var cfg *api.AuthzConfig
-	return cfg, jsonpb.UnmarshalString(string(bytes), cfg)
+	var cfg api.AuthzConfig
+	err = jsonpb.UnmarshalString(string(bytes), &cfg)
+	return &cfg, err
 }
