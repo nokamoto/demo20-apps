@@ -55,5 +55,5 @@ jobs:
 
           docker build . --file Dockerfile --tag $IMAGE_NAME --build-arg cmd=${{ matrix.app }}
 
-          # docker tag $IMAGE_NAME $IMAGE_ID:$GITHUB_SHA
-          # docker push $IMAGE_ID:$GITHUB_SHA
+          docker tag $IMAGE_NAME $IMAGE_ID:$GITHUB_SHA
+          docker push $IMAGE_ID:$GITHUB_SHA
