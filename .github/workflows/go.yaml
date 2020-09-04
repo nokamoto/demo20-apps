@@ -22,3 +22,29 @@ jobs:
       run: make
     - name: Diff
       run: git diff --exit-code
+
+  push:
+    name: Push
+    needs: test
+    runs-on: ubuntu-latest
+    # if: github.event_name == 'push'
+    strategy:
+      matrix:
+        app:
+        - demo20-authorizer
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build image
+        run: docker build . --file Dockerfile --tag ${{ matrix.app }}
+      - name: Log into GitHub Container Registry
+        run: echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Push image to GitHub Container Registry
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/${{ matrix.app }}
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$GITHUB_SHA
+
+          # docker tag $IMAGE_NAME $IMAGE_ID:$GITHUB_SHA
+          # docker push $IMAGE_ID:$GITHUB_SHA
