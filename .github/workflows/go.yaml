@@ -32,6 +32,14 @@ jobs:
       matrix:
         app:
         - authorizer
+        - compute
+        - compute-automated-test
+        - iam
+        - iam-automated-test
+        - rdb
+        - rdb-automated-test
+        - resourcemanager
+        - resourcemanager-automated-test
     steps:
       - uses: actions/checkout@v2
       - name: Log into GitHub Container Registry
