@@ -45,7 +45,7 @@ jobs:
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$GITHUB_SHA
 
-          docker build . --file Dockerfile --tag $IMAGE_NAME --build-arg ${{ matrix.app }}
+          docker build . --file Dockerfile --tag $IMAGE_NAME --build-arg cmd=${{ matrix.app }}
 
           # docker tag $IMAGE_NAME $IMAGE_ID:$GITHUB_SHA
           # docker push $IMAGE_ID:$GITHUB_SHA
