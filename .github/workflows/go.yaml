@@ -65,8 +65,12 @@ jobs:
     # if: github.event_name == 'push'
     steps:
     - run: |
+        VALUES=authorizer.tag=${GITHUB_SHA}
+        VALUES=${VALUES},compute.tag=${GITHUB_SHA},iam.tag=${GITHUB_SHA},rdb.tag=${GITHUB_SHA},resourcemanager.tag=${GITHUB_SHA}
+        VALUES=${VALUES},computeautomatedtest.tag=${GITHUB_SHA},iamautomatedtest.tag=${GITHUB_SHA},rdbautomatedtest=${GITHUB_SHA},resourcemanagerautomatedtest.tag=${GITHUB_SHA}
+
         docker run \
-          -e VALUES=authorizer.tag=${GITHUB_SHA},compute.tag=${GITHUB_SHA},iam.tag=${GITHUB_SHA},rdb.tag=${GITHUB_SHA},resourcemanager.tag=${GITHUB_SHA}\
+          -e VALUES=${VALUES}\
           -e VALUES_FILE=apps/values.yaml\
           -e DRY_RUN=1\
           -e GIT_MESSAGE="Update ${GITHUB_SHA}"\
