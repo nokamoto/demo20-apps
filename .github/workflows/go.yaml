@@ -74,4 +74,4 @@ jobs:
           -e VALUES_FILE=apps/values.yaml\
           -e GIT_MESSAGE="Update ${GITHUB_SHA}"\
           -e GH_PAT=${{ secrets.CR_PAT }}\
-          ghcr.io/nokamoto/demo20-gitops-plugin:fd03cc4ecf506c8ca2156f9b3990fa12f6597cbc
+          ghcr.io/nokamoto/demo20-gitops-plugin:891468607c8cc5fd848cd0766897f0d3157e061c
