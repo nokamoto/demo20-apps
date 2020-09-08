@@ -67,7 +67,7 @@ jobs:
     - run: |
         VALUES=authorizer.tag=${GITHUB_SHA}
         VALUES=${VALUES},compute.tag=${GITHUB_SHA},iam.tag=${GITHUB_SHA},rdb.tag=${GITHUB_SHA},resourcemanager.tag=${GITHUB_SHA}
-        VALUES=${VALUES},computeautomatedtest.tag=${GITHUB_SHA},iamautomatedtest.tag=${GITHUB_SHA},rdbautomatedtest=${GITHUB_SHA},resourcemanagerautomatedtest.tag=${GITHUB_SHA}
+        VALUES=${VALUES},computeautomatedtest.tag=${GITHUB_SHA},iamautomatedtest.tag=${GITHUB_SHA},rdbautomatedtest.tag=${GITHUB_SHA},resourcemanagerautomatedtest.tag=${GITHUB_SHA}
 
         docker run \
           -e VALUES=${VALUES}\
