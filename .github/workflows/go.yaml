@@ -57,3 +57,18 @@ jobs:
 
           docker tag $IMAGE_NAME $IMAGE_ID:$GITHUB_SHA
           docker push $IMAGE_ID:$GITHUB_SHA
+
+  commit:
+    name: Commit 
+    # needs: push
+    runs-on: ubuntu-latest
+    # if: github.event_name == 'push'
+    steps:
+    - run: |
+        docker run \
+          -e VALUES=authorizer.tag=${GITHUB_SHA},compute.tag=${GITHUB_SHA},iam.tag=${GITHUB_SHA},rdb.tag=${GITHUB_SHA},resourcemanager.tag=${GITHUB_SHA}\
+          -e VALUES_FILE=apps/values.yaml\
+          -e DRY_RUN=1\
+          -e GIT_MESSAGE="Update ${GITHUB_SHA}"\
+          -e GH_PAT=${{ secrets.CR_PAT }}\
+          ghcr.io/nokamoto/demo20-gitops-plugin:fd03cc4ecf506c8ca2156f9b3990fa12f6597cbc
