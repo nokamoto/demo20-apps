@@ -72,7 +72,6 @@ jobs:
         docker run \
           -e VALUES=${VALUES}\
           -e VALUES_FILE=apps/values.yaml\
-          -e DRY_RUN=1\
           -e GIT_MESSAGE="Update ${GITHUB_SHA}"\
           -e GH_PAT=${{ secrets.CR_PAT }}\
           ghcr.io/nokamoto/demo20-gitops-plugin:fd03cc4ecf506c8ca2156f9b3990fa12f6597cbc
